@@ -1,0 +1,28 @@
+{
+  "name": "@repo/utils",
+  "version": "1.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "build": "tsup src/index.ts --dts",
+    "dev": "tsup src/index.ts --dts --watch"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.7.0",
+    "@supabase/supabase-js": "^2.57.0",
+    "@tanstack/react-query": "^5.87.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.19.13",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "tsup": "^8.1.0",
+    "typescript": "5.4.5"
+  },
+  "peerDependencies": {
+    "next": "15.5.2",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  }
+}
