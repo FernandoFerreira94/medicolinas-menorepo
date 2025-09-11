@@ -1,4 +1,5 @@
 export interface UsuarioProps {
+  token?: string;
   nome_completo: string;
   cpf: string;
   matricula: string;
@@ -7,4 +8,21 @@ export interface UsuarioProps {
   permissao_agua: boolean;
   permissao_gas: boolean;
   funcao: string;
+}
+
+export interface LoginProps {
+  matricula: string;
+  password: string;
+}
+
+export interface UserProps {
+  token: string;
+  user: UsuarioProps;
+}
+
+export interface InputDateProps {
+  month: number;
+  setMonth: (month: number) => void;
+  year: number;
+  setYear: (year: number) => void;
 }

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Roboto, Inter } from "next/font/google";
 import "./globals.css";
-import { AppProvider } from "../context/AppProvider";
-
+import { AppProvider } from "./context/AppProvider";
+import { ThemeProvider } from "@/components/ui/theme-provider";
 const roboto = Roboto({
   weight: ["400", "700"], // Especifique os pesos que você vai usar
   style: ["normal", "italic"],
@@ -28,11 +28,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
-        className={`${roboto.variable} ${inter.variable} font-sans antialiased bg-gray-50`}
+        className={`${roboto.variable} ${inter.variable} font-sans antialiased bg-gray-50 dark:bg-[#1F1F30]`}
       >
-        <AppProvider>{children}</AppProvider>
+        <AppProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+          </ThemeProvider>
+        </AppProvider>
       </body>
     </html>
   );

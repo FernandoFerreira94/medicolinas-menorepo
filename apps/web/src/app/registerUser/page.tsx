@@ -2,20 +2,19 @@
 import { useState, useEffect } from "react";
 import { Content } from "../../componente/content";
 import { Title } from "../../componente/title";
-import { Input } from "../../components/input";
-import { Label } from "../../components/label";
+import { Input } from "../../../components/ui/input";
+import { Label } from "../../../components/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../components/select";
-import { Switch } from "../../components/switch";
-import { Button } from "../../components/button";
+} from "../../../components/ui/select";
+import { Switch } from "../../../components/ui/switch";
+import { Button } from "../../../components/ui/button";
 import { useSignUp } from "@repo/utils";
 import type { UsuarioProps } from "@repo/utils";
-import { useAppContext } from "@/src/context/useAppContext";
 
 export default function Register() {
   const [funcao, setFuncao] = useState("");
@@ -23,8 +22,6 @@ export default function Register() {
   const [permissaoAgua, setPermissaoAgua] = useState(false);
   const [permissaoGas, setPermissaoGas] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
-
-  const { setUser } = useAppContext();
 
   const resetFormFields = () => {
     setFuncao("");
@@ -34,11 +31,10 @@ export default function Register() {
     setIsAdmin(false);
   };
   const { mutate } = useSignUp({
-    onSuccess: (data) => {
+    onSuccess: () => {
       resetFormFields();
-      setUser(data);
+
       alert("Cadastro realizado com sucesso!");
-      console.log(data);
     },
     onError: (error) => {
       alert(error.message);
@@ -51,11 +47,6 @@ export default function Register() {
     const nome_completo = formData.get("nome_completo") as string;
     const matricula = formData.get("matricula") as string;
     const cpf = formData.get("cpf") as string;
-
-    if (!cpf || cpf.length < 6) {
-      alert("A matrícula deve ter no mínimo 6 dígitos.");
-      return; // Impede a submissão do formulário
-    }
 
     const userData: UsuarioProps = {
       nome_completo: nome_completo as string,
@@ -78,20 +69,20 @@ export default function Register() {
     setPermissaoGas(false);
     setIsAdmin(false);
 
-    if (funcao === "coordenador" || funcao === "M2") {
+    if (funcao === "Coordenador" || funcao === "M2-Supervisor") {
       setPermissaoEnergia(true);
       setPermissaoAgua(true);
       setPermissaoGas(true);
       setIsAdmin(true);
-    } else if (funcao === "M7" || funcao === "M9") {
+    } else if (funcao === "M7-Líder" || funcao === "M9-Eletromecânico") {
       setPermissaoEnergia(true);
       setPermissaoAgua(true);
       setPermissaoGas(true);
-    } else if (funcao === "M5") {
+    } else if (funcao === "M5-Eletricista") {
       setPermissaoEnergia(true);
-    } else if (funcao === "M4") {
+    } else if (funcao === "M4-Serviços Gerais") {
       setPermissaoAgua(true);
-    } else if (funcao === "bravo") {
+    } else if (funcao === "Bombeiro") {
       setPermissaoGas(true);
     }
     // Não precisa de um 'else' no final, pois os estados já foram definidos como 'false' no início do hook.
@@ -121,13 +112,17 @@ export default function Register() {
               <SelectValue placeholder="Selecione a função" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="coordenador">Coordenador</SelectItem>
-              <SelectItem value="M2">M2 - Supervisor</SelectItem>
-              <SelectItem value="M9">M9 - Eletromecânico</SelectItem>
-              <SelectItem value="M7">M7 - Líder</SelectItem>
-              <SelectItem value="M5">M5 - Eletricista</SelectItem>
-              <SelectItem value="M4">M4 - Serviços Gerais</SelectItem>
-              <SelectItem value="bravo">Bombeiro</SelectItem>
+              <SelectItem value="Coordenador">Coordenador</SelectItem>
+              <SelectItem value="M2-Supervisor">M2 - Supervisor</SelectItem>
+              <SelectItem value="M9-Eletromecânico">
+                M9 - Eletromecânico
+              </SelectItem>
+              <SelectItem value="M7-Líder">M7 - Líder</SelectItem>
+              <SelectItem value="M5-Eletricista">M5 - Eletricista</SelectItem>
+              <SelectItem value="M4-Serviços Gerais">
+                M4 - Serviços Gerais
+              </SelectItem>
+              <SelectItem value="Bombeiro">Bombeiro</SelectItem>
             </SelectContent>
           </Select>
         </div>

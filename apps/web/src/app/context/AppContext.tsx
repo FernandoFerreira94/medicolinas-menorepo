@@ -7,6 +7,15 @@ interface AppContextType {
   setShowSideBar: (showSideBar: boolean) => void;
   user: UsuarioProps | null;
   setUser: (user: UsuarioProps | null) => void;
+  token: string | null;
+  setToken: (token: string | null) => void;
+  month: number;
+  setMonth: (month: number) => void;
+  year: number;
+  setYear: (year: number) => void;
+  typeMedicao: string;
+  setTypeMedicao: (typeMedicao: string) => void;
+  isLoading: boolean;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);

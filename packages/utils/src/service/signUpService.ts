@@ -1,24 +1,21 @@
-import { SupabaseClient } from "@supabase/supabase-js";
 import type { UsuarioProps } from "../types";
+import { supabase } from "../supabase";
 
-export async function signUp(
-  client: SupabaseClient,
-  {
-    nome_completo,
-    cpf,
-    matricula,
-    is_adm,
-    permissao_energia,
-    permissao_agua,
-    permissao_gas,
-    funcao,
-  }: UsuarioProps
-) {
+export async function signUp({
+  nome_completo,
+  cpf,
+  matricula,
+  is_adm,
+  permissao_energia,
+  permissao_agua,
+  permissao_gas,
+  funcao,
+}: UsuarioProps) {
   const emailColinas = `${matricula}@colinas.com.br`;
   const passwordCpf = cpf.slice(0, 6);
 
   // Usa o cliente recebido como parâmetro
-  const { data: authData, error: authError } = await client.auth.signUp({
+  const { data: authData, error: authError } = await supabase.auth.signUp({
     email: emailColinas,
     password: passwordCpf,
   });
@@ -31,7 +28,7 @@ export async function signUp(
   const userId = authData.user?.id;
 
   // Usa o cliente recebido como parâmetro
-  const { data: dbData, error: dbError } = await client
+  const { data: dbData, error: dbError } = await supabase
     .from("usuarios")
     .insert([
       {

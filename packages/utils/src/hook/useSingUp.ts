@@ -1,7 +1,7 @@
 // apps/web/src/hooks/useSignUp.ts
 
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { signUp } from "../service/signUp";
+import { signUp } from "../service/signUpService";
 import { createSupabaseBrowserClient } from "../client";
 import { UsuarioProps } from "../types"; // Importa a interface
 
@@ -11,10 +11,7 @@ export function useSignUp(
   const supabase = createSupabaseBrowserClient();
 
   return useMutation({
-    mutationFn: async (data: UsuarioProps) => {
-      // Cria uma função que recebe os dados e chama signUp com o cliente e os dados
-      return signUp(supabase, data);
-    },
+    mutationFn: signUp,
     onSuccess: () => {
       alert("Cadastro realizado com sucesso!");
     },

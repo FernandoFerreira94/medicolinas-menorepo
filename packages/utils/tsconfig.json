@@ -4,6 +4,6 @@
     "outDir": "dist",
     "composite": true
   },
-  "include": ["src", "index.ts"],
+  "include": ["src", "index.ts", "src/hook/useUser.tsx"],
   "exclude": ["node_modules"]
 }

@@ -1,15 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Logo from "@/src/assets/Logo.png";
 import LogoWhite from "@/src/assets/LogoWhite.png";
-//import { Input } from "../componente/Input";
-import { Input } from "../components/input";
-import { Button } from "../components/button";
-import { useRouter } from "next/navigation";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
 import Link from "next/link";
-import { Label } from "../components/label";
+import { Label } from "../../components/ui/label";
+import { useSignIn } from "@repo/utils";
+import { ButtonLoading } from "../../components/ui/buttonLoading";
+import { useAppContext } from "./context/useAppContext";
+import Cookie from "js-cookie";
 
 export function SplashScreen() {
   const [isVisible, setIsVisible] = useState(true);
@@ -47,18 +50,37 @@ export function SplashScreen() {
 }
 
 export default function Login() {
+  const { setToken } = useAppContext();
   const router = useRouter();
+  const { mutate, isPending } = useSignIn({
+    onSuccess: (data) => {
+      setToken(data.session.access_token);
+      Cookie.set("auth_token", data.session.access_token, { expires: 7 });
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>): void {
+      router.push("/medicao");
+    },
+    onError: (error) => {
+      alert(`Erro no login: ${error.message}`);
+      setToken(null);
+
+      Cookie.set("auth_token", "", { expires: 7 });
+    },
+  });
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
-    const matricula = formData.get("matricula");
-    const password = formData.get("password");
+    //const matricula = formData.get("matricula") as string;
+    //const password = formData.get("password") as string;
+    const matricula = "123456";
+    const password = "454184";
 
-    const data = { matricula, password };
-    console.log(data);
+    if (!matricula || !password) {
+      alert("Por favor, preencha todos os campos.");
+      return;
+    }
 
-    router.push("/dashboard");
+    mutate({ matricula, password });
   }
 
   return (
@@ -67,13 +89,16 @@ export default function Login() {
         className="border w-3/12 min-w-140 h-full bg-gray-50 rounded-2xl flex flex-col items-center py-12 
         max-sm:min-w-10/12 max-sm:py-8"
       >
-        <Image
-          src={Logo}
-          alt="Logo"
-          width={300}
-          height={300}
-          className="max-sm:w-10/12"
-        />
+        <div className="relative w-full h-[150px] max-sm:w-10/12 mb-4">
+          <Image
+            src={Logo}
+            alt="Logo"
+            priority
+            fill
+            style={{ objectFit: "contain" }}
+            className="max-sm:w-10/12 "
+          />
+        </div>
         <form
           onSubmit={handleSubmit}
           className="flex flex-col w-10/12 px-2 gap-2 max-sm:w-11/12"
@@ -118,11 +143,14 @@ export default function Login() {
             </Link>
           </Label>
 
-          <Button type="submit">Acessar</Button>
+          {isPending ? (
+            <ButtonLoading />
+          ) : (
+            <Button type="submit">Acessar</Button>
+          )}
         </form>
       </div>
 
-      {/* SplashScreen aparece sobre a tela de login */}
       <SplashScreen />
     </main>
   );

@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Logo from "../../assets/Logo.png";
-import { Input } from "@repo/ui";
-import { Button } from "@repo/ui";
-import { Label } from "@repo/ui";
+import { Input } from "../../../components/ui/input";
+import { Button } from "../../../components/ui/button";
+import { Label } from "../../../components/ui/label";
 import { IoIosArrowBack } from "react-icons/io";
 import Link from "next/link";
 
