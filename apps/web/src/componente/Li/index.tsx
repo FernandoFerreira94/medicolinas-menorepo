@@ -13,7 +13,7 @@ export function Li({
   return (
     <li
       title={title}
-      className={`text-gray-100 flex gap-2 items-center text-basic  h-12 hover:bg-[#2d2d50]  w-full justify-center  cursor-pointer text-basic ${
+      className={`text-gray-100 flex gap-2 items-center text-basic  h-12 hover:bg-[#2d2d50] dark:hover:bg-[#2B2B41]  w-full justify-center  cursor-pointer text-basic ${
         showSideBar ? "justify-start pl-4" : "justify-center"
       } ${className}`}
     >

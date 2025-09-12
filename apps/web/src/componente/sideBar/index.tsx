@@ -3,9 +3,8 @@ import LogoI from "../../assets/IconsIwhite.png";
 import Logo from "../../assets/LogoWhite.png";
 import { BsMenuButtonWideFill } from "react-icons/bs";
 import { MdStore } from "react-icons/md";
-import { FaUserAlt } from "react-icons/fa";
+import { FaUserAlt, FaUserCircle } from "react-icons/fa";
 import { FaFilePdf } from "react-icons/fa6";
-import { FaUserCircle } from "react-icons/fa";
 import { IoLogOut } from "react-icons/io5";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -22,17 +21,17 @@ export function SideBar() {
   const router = useRouter();
   const { setTheme } = useTheme();
   function handleLogout() {
-    setTheme("light");
     setUser(null);
     setToken(null);
     Cookies.remove("auth_token");
     router.push("/");
+    setTheme("light");
   }
 
   return (
     <nav
       className={`fixed top-0 rounded-tr-[16px] rounded-br-[16px]  flex flex-col items-center h-screen bg-[${roxoPrimary}] dark:bg-[${roxoDark}]  shadow-md transition-all duration-800 
-        ${showSideBar ? "w-40 " : "w-16 "}
+        ${showSideBar ? "w-42 " : "w-16 "}
           
       }`}
     >
@@ -56,7 +55,7 @@ export function SideBar() {
         )}
       </div>
 
-      <ul className=" flex flex-col h-full w-full items-center text-sm py-3 ">
+      <ul className=" flex flex-col h-full w-full items-center text-basic py-3 ">
         <Li title="Painel">
           <Link
             href="/medicao"
@@ -64,7 +63,7 @@ export function SideBar() {
               showSideBar ? "justify-start " : "justify-center"
             }`}
           >
-            <BsMenuButtonWideFill size={20} />
+            <BsMenuButtonWideFill size={22} />
             {showSideBar && <span>Painel</span>}
           </Link>
         </Li>
@@ -76,12 +75,12 @@ export function SideBar() {
               showSideBar ? "justify-start " : "justify-center"
             }`}
           >
-            <MdAddBusiness size={22} className="text-gray-100 " />{" "}
+            <MdAddBusiness size={26} className="text-gray-100 " />{" "}
             {showSideBar && <span>Cadastrar loja</span>}
           </Link>
         </Li>
         <Li title="Editar loja">
-          <MdStore size={22} className="text-gray-100 " />{" "}
+          <MdStore size={26} className="text-gray-100 " />{" "}
           {showSideBar && <span>Editar loja</span>}
         </Li>
         <Li title="Cadastrar usuário">
@@ -93,7 +92,7 @@ export function SideBar() {
           >
             <TiUserAdd
               className={`text-gray-50 ${
-                showSideBar ? "text-[28px]" : "text-3xl"
+                showSideBar ? "text-[30px]" : "text-3xl"
               }`}
             />{" "}
             {showSideBar && (
@@ -104,7 +103,7 @@ export function SideBar() {
           </Link>
         </Li>
         <Li title="Editar usuário">
-          <FaUserAlt size={20} className="text-gray-100" />{" "}
+          <FaUserAlt size={24} className="text-gray-100" />{" "}
           {showSideBar && <span>Editar usuário</span>}
         </Li>
 
@@ -115,13 +114,13 @@ export function SideBar() {
               showSideBar ? "justify-start " : "justify-center"
             }`}
           >
-            <FaFilePdf size={20} />
+            <FaFilePdf size={24} />
             {showSideBar && <span>Exporta PDF</span>}
           </Link>
         </Li>
 
         <Li title="Perfil">
-          <FaUserCircle size={20} className="text-gray-100" />{" "}
+          <FaUserCircle size={24} className="text-gray-100" />{" "}
           {showSideBar && <span>Perfil</span>}
         </Li>
 
@@ -133,7 +132,7 @@ export function SideBar() {
             onClick={handleLogout}
             className=" h-full flex items-center gap-2 w-full justify-center  cursor-pointer"
           >
-            <IoLogOut size={22} className="text-gray-100    " />
+            <IoLogOut size={26} className="text-gray-100    " />
             {showSideBar && <span>Sair</span>}
           </button>
         </Li>

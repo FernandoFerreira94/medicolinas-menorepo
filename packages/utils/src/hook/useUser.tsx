@@ -1,11 +1,13 @@
-// apps/web/src/app/context/useUser.tsx
-
 import { useQuery } from "@tanstack/react-query";
 import Cookies from "js-cookie";
 import { fetchUser, UsuarioProps, supabase } from "../../index";
 
-// Função de busca que será usada pelo useQuery
-const getUserData = async (): Promise<UsuarioProps | null> => {
+type UserWithSession = {
+  user: UsuarioProps | null;
+  access_token: string;
+} | null;
+
+const getUserData = async (): Promise<UserWithSession> => {
   const storedToken = Cookies.get("auth_token");
 
   if (!storedToken) {
@@ -13,23 +15,24 @@ const getUserData = async (): Promise<UsuarioProps | null> => {
   }
 
   const {
-    data: { user: supabaseUser },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  if (supabaseUser) {
-    const userData = await fetchUser(supabaseUser.id as string);
-    return userData;
-  }
+  if (!session) return null;
 
-  return null;
+  const userData = await fetchUser(session.user.id as string);
+
+  return {
+    user: userData,
+    access_token: session.access_token,
+  };
 };
 
-// O hook que você usará nos seus componentes
 export function useUser() {
-  return useQuery({
-    queryKey: ["user"], // Chave única para identificar a query
-    queryFn: getUserData, // A função que busca os dados
-    retry: false, // Desabilita o retry automático para autenticação
-    refetchOnWindowFocus: false, // Desabilita refetch desnecessário
+  return useQuery<UserWithSession>({
+    queryKey: ["user"],
+    queryFn: getUserData,
+    retry: false,
+    refetchOnWindowFocus: false,
   });
 }

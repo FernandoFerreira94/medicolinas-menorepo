@@ -8,7 +8,7 @@ export interface UsuarioProps {
   permissao_agua: boolean;
   permissao_gas: boolean;
   funcao: string;
-}
+} 
 
 export interface LoginProps {
   matricula: string;
@@ -25,4 +25,31 @@ export interface InputDateProps {
   setMonth: (month: number) => void;
   year: number;
   setYear: (year: number) => void;
+}
+
+export interface LojaProps {
+  nome_loja: string;
+  numero_loja: string;
+  complexo: string;
+  ativa: boolean;
+  tem_energia: boolean;
+  tem_agua: boolean;
+  tem_gas: boolean;
+}
+
+export interface MEdidorDadosForm {
+  tipo_medicao: string;
+  numero_relogio: string;
+  localidade: string;
+  ultima_leitura: number;
+  detalhes: string;
+}
+
+export interface MedidorProps extends MEdidorDadosForm {
+  loja_id: string;
+}
+
+export interface CreateLojaData {
+  loja: LojaProps;
+  medidores: MEdidorDadosForm[];
 }

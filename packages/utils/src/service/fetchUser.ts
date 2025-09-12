@@ -6,7 +6,7 @@ export async function fetchUser(userId: string): Promise<UsuarioProps | null> {
     const { data, error } = await supabase
       .from("usuarios")
       .select("*") // Seleciona todas as colunas
-      .eq("id", userId) // Filtra pelo ID do usuário
+      .eq("user_id", userId) // Filtra pelo ID do usuário
       .single(); // Garante que retorne apenas um registro
 
     if (error) {

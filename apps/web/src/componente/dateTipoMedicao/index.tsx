@@ -94,15 +94,17 @@ export function DateTipoMedicao() {
       <div className="w-200 h-full flex items-end relative mr-auto">
         <Input
           placeholder="Busque por loja, numero, medidor..."
-          className="w-full pl-10 pr-4 py-3 rounded-2xl border border-gray-300  bg-white dark:bg-gray-900 dark:border-gray-600"
+          className="w-full pl-10 pr-4 py-3 rounded-2xl border border-gray-300  "
           type="search"
         />
         <MdSearch size={20} className="absolute left-3 top-10 text-gray-500" />
       </div>
-      <Localidade />
+      <div className="w-40 h-full flex items-end text-gray-900 dark:text-gray-50 ">
+        <Localidade />
+      </div>
       <div className="w-40 h-full flex items-end ">
         <Select required value={typeMedicao} onValueChange={setTypeMedicao}>
-          <SelectTrigger className="bg-white dark:bg-[#151526]">
+          <SelectTrigger>
             <SelectValue placeholder={"Selecione o tipo de medição"} />
           </SelectTrigger>
           <SelectContent className="flex">

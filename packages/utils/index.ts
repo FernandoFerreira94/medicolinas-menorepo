@@ -8,3 +8,7 @@ export * from "./src/service/signInService";
 export * from "./src/service/fetchUser";
 export * from "./src/hook/useUser";
 export * from "./src/color";
+export * from "./src/service/recoverRegistration";
+export * from "./src/variavel/capitalizeWords";
+export * from "./src/hook/useCreateLoja";
+export * from "./src/service/CreateLojaService";

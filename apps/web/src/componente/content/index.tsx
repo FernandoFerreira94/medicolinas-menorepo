@@ -8,14 +8,21 @@ import { SideBar } from "../../componente/sideBar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ModeToggle } from "@/components/ui/modeToggle";
 import { roxoPrimary } from "@repo/utils";
+import { Title } from "../title";
 
-export function Content({ children }: { children: React.ReactNode }) {
+export function Content({
+  children,
+  title,
+}: {
+  children: React.ReactNode;
+  title: string;
+}) {
   const { showSideBar, setShowSideBar } = useAppContext();
   const { data: user, isLoading } = useUser(); // 👈 Use o hook aqui
 
   // Se o carregamento terminou e o usuário existe, renderize o conteúdo.
-  const firstName = user?.nome_completo.split(" ")[0];
-  const userFunction = user?.funcao;
+  const firstName = user?.user?.nome_completo.split(" ")[0];
+  const userFunction = user?.user?.funcao;
 
   return (
     <main className="h-full text-gray-900 dark:text-gray-50">
@@ -62,7 +69,12 @@ export function Content({ children }: { children: React.ReactNode }) {
             <ModeToggle />
           </div>
         </div>
-        <div className="mt-4 h-full pl-13 border-t">{children}</div>
+        <div className="mt-4 h-full pl-13 border-t mb-20">
+          <section className="w-full flex mt-4 ">
+            <Title text={title} />
+          </section>
+          {children}
+        </div>
       </div>
     </main>
   );

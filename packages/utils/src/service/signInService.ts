@@ -26,7 +26,7 @@ export async function signInService({ matricula, password }: LoginProps) {
   const { data: userData, error: userError } = await supabase
     .from("usuarios")
     .select("*")
-    .eq("id", userId)
+    .eq("user_id", userId)
     .single();
 
   if (userError) {

@@ -9,11 +9,11 @@ export default function Dashboard() {
   const { month, year, typeMedicao } = useAppContext();
 
   return (
-    <Content>
-      <section className="w-full flex mt-4 ">
-        <Title text="Painel" />
+    <Content title="Painel medição">
+      <section className="w-full flex ">
         <DateTipoMedicao />
       </section>
+
       <section className="w-full flex flex-wrap gap-8 mt-16">
         <Card />
         <Card />

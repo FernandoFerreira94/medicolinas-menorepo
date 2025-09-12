@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Content } from "../../componente/content";
-import { Title } from "../../componente/title";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import {
@@ -89,8 +88,7 @@ export default function Register() {
   }, [funcao]);
 
   return (
-    <Content>
-      <Title text="Cadastrar Usuário" />
+    <Content title="Cadastrar Usuário">
       <form
         onSubmit={handleSubmit}
         className="flex flex-col max-w-xl gap-4 mt-8"

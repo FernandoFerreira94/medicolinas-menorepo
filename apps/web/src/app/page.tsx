@@ -135,12 +135,6 @@ export default function Login() {
               name="password"
               className="max-sm:text-sm max-sm:h-12"
             />
-            <Link
-              href="/recoverPassword"
-              className="text-gray-500 text-sm w-full font-normal text-end transition duration-300 hover:text-cyan-600"
-            >
-              Esqueceu a senha?
-            </Link>
           </Label>
 
           {isPending ? (

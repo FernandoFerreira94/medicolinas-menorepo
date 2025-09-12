@@ -4,7 +4,7 @@ import { Button } from "../ui/button";
 
 export function ButtonLoading() {
   return (
-    <Button className="h-" disabled>
+    <Button className="w-full" disabled>
       <Loader2Icon className="animate-spin" />
       Please wait
     </Button>

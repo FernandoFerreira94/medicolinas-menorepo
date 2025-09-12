@@ -3,8 +3,6 @@
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
 import { signInService } from "../service/signInService";
 import { LoginProps, UsuarioProps } from "../types"; // Importe a interface LoginProps
-import { Session } from "@supabase/supabase-js";
-import { createSupabaseBrowserClient } from "../client";
 
 // Tipagem para o retorno da mutação
 interface SignInMutationReturn {

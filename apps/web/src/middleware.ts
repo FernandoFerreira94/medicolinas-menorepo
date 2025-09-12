@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get("auth_token")?.value;
-  console.log("teste");
 
   // Lista de rotas públicas
   const publicPaths = ["/", "/recoverRegistration", "/recoverPassword"];
