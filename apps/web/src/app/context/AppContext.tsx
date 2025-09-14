@@ -15,7 +15,6 @@ interface AppContextType {
   setYear: (year: number) => void;
   typeMedicao: string;
   setTypeMedicao: (typeMedicao: string) => void;
-  isLoading: boolean;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);

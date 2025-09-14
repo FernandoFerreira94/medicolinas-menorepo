@@ -1,10 +1,10 @@
 // apps/web/src/context/AppProvider.tsx
 
 "use client";
-import { ReactNode, useState, useEffect, use } from "react";
+import { ReactNode, useState, useEffect } from "react";
 import { AppContext } from "./AppContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { UsuarioProps } from "@repo/utils";
+import { UsuarioProps, useUser, fetchLojas } from "@repo/utils";
 
 interface AppProviderProps {
   children: ReactNode;
@@ -22,7 +22,25 @@ export function AppProvider({ children }: AppProviderProps) {
   const [queryClient] = useState(() => new QueryClient());
   const [typeMedicao, setTypeMedicao] = useState<string>("");
 
-  useEffect(() => {});
+  useEffect(() => {
+    async function getLojas() {
+      const lojas = await fetchLojas("Gas");
+      console.log(lojas);
+    }
+    getLojas();
+  });
+
+  const { data } = useUser();
+  useEffect(() => {
+    function getUser() {
+      if (data) {
+        setUser(data.user);
+        setToken(data.access_token);
+      }
+    }
+
+    getUser();
+  }, [data, user]);
 
   useEffect(() => {
     if (user) {
@@ -60,7 +78,6 @@ export function AppProvider({ children }: AppProviderProps) {
         setYear,
         typeMedicao,
         setTypeMedicao,
-        isLoading: false, // isLoading se torna irrelevante aqui
       }}
     >
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

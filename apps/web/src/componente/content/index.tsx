@@ -3,7 +3,6 @@
 "use client";
 import { MdOutlineToggleOff, MdToggleOn } from "react-icons/md";
 import { useAppContext } from "../../app/context/useAppContext";
-import { useUser } from "@repo/utils/src/hook/useUser"; // 👈 Importe o novo hook
 import { SideBar } from "../../componente/sideBar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ModeToggle } from "@/components/ui/modeToggle";
@@ -17,12 +16,12 @@ export function Content({
   children: React.ReactNode;
   title: string;
 }) {
-  const { showSideBar, setShowSideBar } = useAppContext();
-  const { data: user, isLoading } = useUser(); // 👈 Use o hook aqui
+  const { showSideBar, setShowSideBar, user } = useAppContext();
+  //const { data: user, isLoading } = useUser(); // 👈 Use o hook aqui
 
   // Se o carregamento terminou e o usuário existe, renderize o conteúdo.
-  const firstName = user?.user?.nome_completo.split(" ")[0];
-  const userFunction = user?.user?.funcao;
+  const firstName = user?.nome_completo.split(" ")[0];
+  const userFunction = user?.funcao;
 
   return (
     <main className="h-full text-gray-900 dark:text-gray-50">
@@ -51,7 +50,7 @@ export function Content({
           </button>
           <div className="flex h-full justify-between items-center w-6/12 ">
             <h1 className="ml-4 text-2xl font-semibold flex items-center">
-              {isLoading ? (
+              {!user ? (
                 <div className="space-y-2 flex items-center">
                   <Skeleton className="h-8 w-[300px]" />
                 </div>

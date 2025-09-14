@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Roboto, Inter } from "next/font/google";
 import "./globals.css";
-import { AppProvider } from "./context/AppProvider";
-import { ThemeProvider } from "@/components/ui/theme-provider";
-import { Toaster } from "sonner";
+import { Providers } from "./Providers";
 
 const roboto = Roboto({
   weight: ["400", "700"], // Especifique os pesos que você vai usar
@@ -34,17 +32,7 @@ export default function RootLayout({
       <body
         className={`${roboto.variable} ${inter.variable} font-sans antialiased bg-gray-50 dark:bg-[#1F1F30]`}
       >
-        <AppProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            {children}
-            <Toaster richColors />
-          </ThemeProvider>
-        </AppProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
