@@ -11,57 +11,38 @@ interface AppProviderProps {
 }
 
 const date = new Date();
+const currentDay = date.getDate();
 const currentMonth = date.getMonth() + 1;
+const currentYear = date.getFullYear();
+const currentDate = `${currentDay}/${currentMonth}/${currentYear}`;
 
 export function AppProvider({ children }: AppProviderProps) {
   const [showSideBar, setShowSideBar] = useState<boolean>(false);
   const [user, setUser] = useState<UsuarioProps | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [dateFull, setDateFull] = useState<string>(currentDate);
   const [month, setMonth] = useState<number>(currentMonth);
-  const [year, setYear] = useState<number>(2025);
+  const [year, setYear] = useState<number>(currentYear);
   const [queryClient] = useState(() => new QueryClient());
   const [typeMedicao, setTypeMedicao] = useState<string>("");
-
-  useEffect(() => {
-    async function getLojas() {
-      const lojas = await fetchLojas("Gas");
-      console.log(lojas);
-    }
-    getLojas();
-  });
-
+  const [localidade, setLocalidade] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("");
   const { data } = useUser();
   useEffect(() => {
     function getUser() {
       if (data) {
         setUser(data.user);
         setToken(data.access_token);
+        const currentName = user?.nome_completo.split(" ")[0];
+        if (currentName) {
+          setFirstName(currentName);
+        }
       }
     }
 
     getUser();
   }, [data, user]);
-
-  useEffect(() => {
-    if (user) {
-      switch (user.funcao) {
-        case "Bombeiro":
-          setTypeMedicao("Gas");
-          break;
-        case "M5-Eletricista":
-          setTypeMedicao("Energia");
-          break;
-        case "M4-Serviços Gerais":
-          setTypeMedicao("Agua");
-          break;
-        default:
-          setTypeMedicao("Energia");
-          break;
-      }
-    } else {
-      setTypeMedicao("Energia");
-    }
-  }, [user]);
 
   return (
     <AppContext.Provider
@@ -72,12 +53,20 @@ export function AppProvider({ children }: AppProviderProps) {
         setUser,
         token,
         setToken,
+        dateFull,
         month,
         setMonth,
         year,
         setYear,
+        setDateFull,
         typeMedicao,
         setTypeMedicao,
+        localidade,
+        setLocalidade,
+        firstName,
+        setFirstName,
+        searchQuery,
+        setSearchQuery,
       }}
     >
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

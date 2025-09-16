@@ -5,23 +5,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-interface LocalidadeProps {
-  value: string;
-  onValueChange: (value: string) => void;
-}
+import { useAppContext } from "@/src/app/context/useAppContext";
 
-export function Localidade({ value, onValueChange }: LocalidadeProps) {
+export function Localidade() {
+  const { setLocalidade, localidade } = useAppContext();
+
   return (
     <Select
-      required
-      defaultValue={"Sub-Adm"}
-      value={value}
-      onValueChange={onValueChange}
+      onValueChange={setLocalidade}
+      value={localidade === null ? "all" : localidade}
     >
       <SelectTrigger className="bg-white dark:bg-[#151526]">
         <SelectValue placeholder={"Selecione a localização"} />
       </SelectTrigger>
       <SelectContent className="flex">
+        <SelectItem value="all" className="flex items-center gap-2">
+          All
+        </SelectItem>
         <SelectItem value="Sub-Adm" className="flex items-center gap-2">
           Sub-Adm
         </SelectItem>

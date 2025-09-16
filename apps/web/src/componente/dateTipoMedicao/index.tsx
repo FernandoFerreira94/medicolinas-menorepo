@@ -11,13 +11,11 @@ import {
 import { MdSearch } from "react-icons/md";
 import { InputDate } from "@/components/ui/inputDate";
 import { useAppContext } from "@/src/app/context/useAppContext";
-import { useUser } from "@repo/utils";
 import { useEffect } from "react"; // 👈 Importe useEffect
 import { Localidade } from "./localidade";
 
 export function DateTipoMedicao() {
-  const { setTypeMedicao, typeMedicao } = useAppContext();
-  const { data: user } = useUser();
+  const { setTypeMedicao, typeMedicao, user, setSearchQuery } = useAppContext();
 
   useEffect(() => {
     if (user) {
@@ -57,7 +55,7 @@ export function DateTipoMedicao() {
           <SelectItem value="Agua" className="flex items-center gap-2">
             Água
           </SelectItem>
-          <SelectItem value="Gás" className="flex items-center gap-2">
+          <SelectItem value="Gas" className="flex items-center gap-2">
             Gás
           </SelectItem>
         </>
@@ -90,12 +88,12 @@ export function DateTipoMedicao() {
 
   return (
     <div className="w-full flex items-center justify-end gap-20 mr-8 mt-4">
-      {/* ... o restante do seu JSX */}
       <div className="w-200 h-full flex items-end relative mr-auto">
         <Input
           placeholder="Busque por loja, numero, medidor..."
           className="w-full pl-10 pr-4 py-3 rounded-2xl border border-gray-300  "
           type="search"
+          onChange={(e) => setSearchQuery(e.target.value)}
         />
         <MdSearch size={20} className="absolute left-3 top-10 text-gray-500" />
       </div>

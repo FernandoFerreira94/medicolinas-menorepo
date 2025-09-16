@@ -12,3 +12,7 @@ export * from "./src/service/recoverRegistration";
 export * from "./src/variavel/capitalizeWords";
 export * from "./src/hook/useCreateLoja";
 export * from "./src/service/CreateLojaService";
+export * from "./src/service/fetchLojas";
+export * from "./src/hook/useGetMedicoes";
+export * from "./src/hook/useCreateLeitura";
+export * from "./src/service/CreateLeitura";

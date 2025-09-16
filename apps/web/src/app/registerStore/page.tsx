@@ -209,10 +209,7 @@ export default function RegisterStore() {
                     name="numero_relogio_energia"
                   />
                   <Label>Localizaçao relogio</Label>
-                  <Localidade
-                    value={localidade_energia}
-                    onValueChange={setLocalidade_energia}
-                  />
+                  <Localidade />
                   <Label>Ultima leitura</Label>
                   <Input
                     type="text"
@@ -253,10 +250,7 @@ export default function RegisterStore() {
                     name="numero_relogio_agua"
                   />
                   <Label>Localizaçao relogio</Label>
-                  <Localidade
-                    value={localidade_agua}
-                    onValueChange={setLocalidade_agua}
-                  />
+                  <Localidade />
                   <Label>Ultima leitura</Label>
                   <Input
                     type="text"
@@ -298,10 +292,7 @@ export default function RegisterStore() {
                     name="numero_relogio_gas"
                   />
                   <Label>Localizaçao relogio</Label>
-                  <Localidade
-                    value={localidade_gas}
-                    onValueChange={setLocalidade_gas}
-                  />
+                  <Localidade />
                   <Label>Ultima leitura</Label>
                   <Input
                     type="text"

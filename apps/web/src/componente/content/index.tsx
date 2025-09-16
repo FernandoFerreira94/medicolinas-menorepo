@@ -16,12 +16,7 @@ export function Content({
   children: React.ReactNode;
   title: string;
 }) {
-  const { showSideBar, setShowSideBar, user } = useAppContext();
-  //const { data: user, isLoading } = useUser(); // 👈 Use o hook aqui
-
-  // Se o carregamento terminou e o usuário existe, renderize o conteúdo.
-  const firstName = user?.nome_completo.split(" ")[0];
-  const userFunction = user?.funcao;
+  const { showSideBar, setShowSideBar, user, firstName } = useAppContext();
 
   return (
     <main className="h-full text-gray-900 dark:text-gray-50">
@@ -55,7 +50,7 @@ export function Content({
                   <Skeleton className="h-8 w-[300px]" />
                 </div>
               ) : (
-                ` ${firstName} - ${userFunction}`
+                ` ${firstName} - ${user.funcao}`
               )}
             </h1>
             <h1
