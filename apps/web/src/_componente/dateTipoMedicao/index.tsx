@@ -15,7 +15,14 @@ import { useEffect } from "react"; // 👈 Importe useEffect
 import { Localidade } from "./localidade";
 
 export function DateTipoMedicao() {
-  const { setTypeMedicao, typeMedicao, user, setSearchQuery } = useAppContext();
+  const {
+    setTypeMedicao,
+    typeMedicao,
+    user,
+    setSearchQuery,
+    localidade,
+    setLocalidade,
+  } = useAppContext();
 
   useEffect(() => {
     if (user) {
@@ -98,7 +105,7 @@ export function DateTipoMedicao() {
         <MdSearch size={20} className="absolute left-3 top-10 text-gray-500" />
       </div>
       <div className="w-40 h-full flex items-end text-gray-900 dark:text-gray-50 ">
-        <Localidade />
+        <Localidade value={localidade} setValue={setLocalidade} />
       </div>
       <div className="w-40 h-full flex items-end ">
         <Select required value={typeMedicao} onValueChange={setTypeMedicao}>

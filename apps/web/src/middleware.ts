@@ -1,11 +1,10 @@
-// apps/web/src/middleware.ts
 import { NextRequest, NextResponse } from "next/server";
 
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get("auth_token")?.value;
 
   // Lista de rotas públicas
-  const publicPaths = ["/", "/recoverRegistration", "/recoverPassword"];
+  const publicPaths = ["/"];
 
   // Verifica se a rota atual é uma rota pública
   const isPublicPath = publicPaths.includes(request.nextUrl.pathname);

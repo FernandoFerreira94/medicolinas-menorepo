@@ -1,12 +1,13 @@
 // apps/web/src/componente/content/index.tsx
 
 "use client";
+import { useState, useEffect } from "react";
 import { MdOutlineToggleOff, MdToggleOn } from "react-icons/md";
 import { useAppContext } from "../../app/context/useAppContext";
-import { SideBar } from "../../componente/sideBar";
+import { SideBar } from "../../_componente/sideBar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ModeToggle } from "@/components/ui/modeToggle";
-import { roxoPrimary } from "@repo/utils";
+import { roxoPrimary, useFetchUser } from "@repo/utils";
 import { Title } from "../title";
 
 export function Content({
@@ -16,7 +17,18 @@ export function Content({
   children: React.ReactNode;
   title: string;
 }) {
-  const { showSideBar, setShowSideBar, user, firstName } = useAppContext();
+  const { showSideBar, setShowSideBar } = useAppContext();
+  const [firstName, setFirstName] = useState<string>("");
+  const { data } = useFetchUser();
+
+  const user = data?.user;
+  const currentName = user?.nome_completo.split(" ")[0];
+
+  useEffect(() => {
+    if (currentName) {
+      setFirstName(currentName);
+    }
+  }, [currentName]);
 
   return (
     <main className="h-full text-gray-900 dark:text-gray-50">

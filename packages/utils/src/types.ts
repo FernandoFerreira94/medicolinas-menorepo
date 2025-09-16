@@ -1,6 +1,6 @@
 // Tipos de Dados Básicos
 export interface UsuarioProps {
-  user_id: string;
+  user_id?: string;
   token?: string;
   nome_completo: string;
   cpf: string;
@@ -74,6 +74,7 @@ export interface Medidor {
   numero_relogio: string;
   ultima_leitura: number;
   detalhes: string | null;
+  data_instalacao: string;
   leituras: LeituraProps[];
 }
 
@@ -86,7 +87,7 @@ export interface CreateLeituraProps {
   leitura_atual: number;
   consumo_mensal: number;
   foto_url: string | null;
-  lida_por_usuario_id: string;
+  lida_por_usuario_id?: string;
   nome_usuario: string;
   detalhes_leitura: string | null;
 }
@@ -98,6 +99,7 @@ export interface MedidorComLeitura {
   numero_relogio: string;
   ultima_leitura: number;
   detalhes: string;
+  data_instalacao: string;
   leituras: LeituraProps[]; // Adicione a leitura aqui, como um array
 }
 

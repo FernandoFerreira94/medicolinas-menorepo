@@ -5,16 +5,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAppContext } from "@/src/app/context/useAppContext";
 
-export function Localidade() {
-  const { setLocalidade, localidade } = useAppContext();
+// Definindo os tipos das props para maior clareza e segurança
+interface LocalidadeProps {
+  value: string;
+  setValue: (value: string) => void;
+}
 
+export function Localidade({ value, setValue }: LocalidadeProps) {
   return (
-    <Select
-      onValueChange={setLocalidade}
-      value={localidade === null ? "all" : localidade}
-    >
+    <Select onValueChange={setValue} value={value === "" ? "all" : value}>
       <SelectTrigger className="bg-white dark:bg-[#151526]">
         <SelectValue placeholder={"Selecione a localização"} />
       </SelectTrigger>

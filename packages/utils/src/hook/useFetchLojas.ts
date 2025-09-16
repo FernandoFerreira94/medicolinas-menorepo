@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchLojas } from "../service/fetchLojas";
 
-export function useGetMedicoes(
+export function useFetchLojas(
   tipoMedicao: string | null = null,
   mes: number | null = null,
   ano: number | null = null,

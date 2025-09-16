@@ -1,6 +1,5 @@
-import type { UsuarioProps } from "../types";
+import type { UsuarioProps, LoginProps } from "../types";
 import { supabase } from "../supabase";
-import type { LoginProps } from "../types";
 
 export async function signInService({ matricula, password }: LoginProps) {
   const emailColinas = `${matricula}@colinas.com.br`;

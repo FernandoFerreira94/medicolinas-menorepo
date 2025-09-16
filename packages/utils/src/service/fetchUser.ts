@@ -1,14 +1,13 @@
 import { supabase } from "../supabase";
-import { UsuarioProps } from "../types"; // Importe a tipagem do seu usuário
+import { UsuarioProps } from "../types";
 
 export async function fetchUser(userId: string): Promise<UsuarioProps | null> {
   try {
     const { data, error } = await supabase
       .from("usuarios")
-      .select("*") // Seleciona todas as colunas
-      .eq("user_id", userId) // Filtra pelo ID do usuário
-      .single(); // Garante que retorne apenas um registro
-
+      .select("*")
+      .eq("user_id", userId)
+      .single();
     if (error) {
       console.error("Erro ao buscar usuário:", error.message);
       return null;

@@ -1,8 +1,9 @@
 "use client";
 
-import { capitalizeWords } from "@repo/utils";
-import { useState, useRef } from "react"; // Adicione useRef aqui
-import { Content } from "@/src/componente/content";
+import { useState, useRef } from "react";
+import { toast } from "sonner";
+
+import { Content } from "@/src/_componente/content";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -15,10 +16,9 @@ import {
   SelectValue,
 } from "../../../components/ui/select";
 import { Switch } from "../../../components/ui/switch";
-import { Localidade } from "@/src/componente/dateTipoMedicao/localidade";
-import { useCreateLoja } from "@repo/utils";
+import { Localidade } from "@/src/_componente/dateTipoMedicao/localidade";
+import { useCreateLoja, capitalizeWords } from "@repo/utils";
 import { ButtonLoading } from "@/components/ui/buttonLoading";
-import { toast } from "sonner";
 
 export default function RegisterStore() {
   // Use useRef para referenciar o formulário
@@ -29,6 +29,7 @@ export default function RegisterStore() {
   const [energia, setEnergia] = useState(false);
   const [agua, setAgua] = useState(false);
   const [gas, setGas] = useState(false);
+  const [prefixo, setPrefixo] = useState("NT");
 
   const [localidade_energia, setLocalidade_energia] = useState("");
   const [localidade_agua, setLocalidade_agua] = useState("");
@@ -37,7 +38,7 @@ export default function RegisterStore() {
   // Função para resetar todos os estados
   const resetForm = () => {
     if (formRef.current) {
-      formRef.current.reset(); // Reseta os campos nativos
+      formRef.current.reset();
     }
     setComplexo("Shopping Colinas");
     setAtiva(true);
@@ -91,6 +92,7 @@ export default function RegisterStore() {
       tem_energia: energia,
       tem_agua: agua,
       tem_gas: gas,
+      prefixo_loja: prefixo,
     };
 
     const medidores = [];
@@ -175,9 +177,21 @@ export default function RegisterStore() {
             />
 
             <Label>Nº loja</Label>
+            <Select required value={prefixo} onValueChange={setPrefixo}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="NT">NT</SelectItem>
+                <SelectItem value="NS">NS</SelectItem>
+                <SelectItem value="QT">QT</SelectItem>
+                <SelectItem value="QS">QS</SelectItem>
+                <SelectItem value=" ">outros</SelectItem>
+              </SelectContent>
+            </Select>
             <Input
               type="text"
-              placeholder="Numero da loja NT-01"
+              placeholder="Numero da loja 01"
               id="numero_loja"
               required
               name="numero_loja"
@@ -209,7 +223,10 @@ export default function RegisterStore() {
                     name="numero_relogio_energia"
                   />
                   <Label>Localizaçao relogio</Label>
-                  <Localidade />
+                  <Localidade
+                    value={localidade_energia}
+                    setValue={setLocalidade_energia}
+                  />
                   <Label>Ultima leitura</Label>
                   <Input
                     type="text"
@@ -250,7 +267,10 @@ export default function RegisterStore() {
                     name="numero_relogio_agua"
                   />
                   <Label>Localizaçao relogio</Label>
-                  <Localidade />
+                  <Localidade
+                    value={localidade_agua}
+                    setValue={setLocalidade_agua}
+                  />
                   <Label>Ultima leitura</Label>
                   <Input
                     type="text"
@@ -292,7 +312,10 @@ export default function RegisterStore() {
                     name="numero_relogio_gas"
                   />
                   <Label>Localizaçao relogio</Label>
-                  <Localidade />
+                  <Localidade
+                    value={localidade_gas}
+                    setValue={setLocalidade_gas}
+                  />
                   <Label>Ultima leitura</Label>
                   <Input
                     type="text"

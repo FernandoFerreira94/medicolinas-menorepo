@@ -1,56 +1,32 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+
+import { SplashScreen } from "../_componente/splashScreen";
 import Logo from "@/src/assets/Logo.png";
-import LogoWhite from "@/src/assets/LogoWhite.png";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
-import Link from "next/link";
 import { Label } from "../../components/ui/label";
-import { useSignIn } from "@repo/utils";
 import { ButtonLoading } from "../../components/ui/buttonLoading";
 import { useAppContext } from "./context/useAppContext";
 import Cookie from "js-cookie";
-
-export function SplashScreen() {
-  const [isVisible, setIsVisible] = useState(true);
-  const [fadeOut, setFadeOut] = useState(false);
-
-  useEffect(() => {
-    // Espera 2s -> inicia fade-out
-    const timer = setTimeout(() => {
-      setFadeOut(true);
-
-      // Espera mais 0.5s -> remove splash do DOM
-      setTimeout(() => setIsVisible(false), 500);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (!isVisible) return null;
-
-  return (
-    <div
-      className={`fixed inset-0 flex justify-center items-center bg-[#3D3C6C] transition-opacity duration-500 ${
-        fadeOut ? "opacity-0" : "opacity-100"
-      } z-50`}
-    >
-      <Image
-        src={LogoWhite}
-        alt="Logo"
-        width={400}
-        height={400}
-        className="max-sm:w-9/12"
-      />
-    </div>
-  );
-}
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { toast } from "sonner";
+import { recoverRegistration, normalizeName, useSignIn } from "@repo/utils";
 
 export default function Login() {
   const { setToken } = useAppContext();
+  const [matriculaVerufy, setMatriculaVerufy] = useState("");
+  const [nomeCompleto, setNomeCompleto] = useState("");
   const router = useRouter();
   const { mutate, isPending } = useSignIn({
     onSuccess: (data) => {
@@ -69,7 +45,7 @@ export default function Login() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const formData = new FormData(event.currentTarget);
+    // const formData = new FormData(event.currentTarget);
     //const matricula = formData.get("matricula") as string;
     //const password = formData.get("password") as string;
     const matricula = "123456";
@@ -82,6 +58,30 @@ export default function Login() {
 
     mutate({ matricula, password });
   }
+
+  async function handleVerify() {
+    const result = await recoverRegistration(nomeCompleto);
+    if (result) {
+      setMatriculaVerufy(result);
+    } else {
+      toast("Usuário não encontrado!");
+      setMatriculaVerufy("");
+    }
+  }
+
+  const handleCopyMatricula = () => {
+    if (typeof window !== "undefined" && matriculaVerufy) {
+      navigator.clipboard
+        .writeText(matriculaVerufy)
+        .then(() => {
+          toast.success("Matrícula copiada com sucesso!");
+        })
+        .catch((err) => {
+          console.error("Erro ao copiar a matrícula: ", err);
+          toast.error("Erro ao copiar a matrícula.");
+        });
+    }
+  };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-[#3D3C6C] relative">
@@ -115,12 +115,64 @@ export default function Login() {
               name="matricula"
               className="max-sm:text-sm max-sm:h-12"
             />
-            <Link
-              href="/recoverRegistration"
-              className="text-gray-500 text-sm font-normal w-full text-end transition duration-300 hover:text-cyan-600"
-            >
-              Esqueceu número da matrícula?
-            </Link>
+            <span className="text-gray-500 text-sm font-normal w-full text-end transition duration-300 hover:text-cyan-600 ">
+              <Sheet>
+                <SheetTrigger className="cursor-pointer">
+                  Esqueceu sua matrícula?
+                </SheetTrigger>
+                <SheetContent className="w-full">
+                  <SheetHeader>
+                    <SheetTitle className="mt-4">
+                      Digite seu nome completo
+                    </SheetTitle>
+                    <SheetDescription className="mt-8 flex flex-col gap-4">
+                      <Label htmlFor="nome_completo" className="text-gray-50">
+                        Nome completo
+                      </Label>
+                      <Input
+                        placeholder="Digite seu nome completo"
+                        type="text"
+                        id="nome_completo"
+                        value={nomeCompleto}
+                        onChange={(e) =>
+                          setNomeCompleto(normalizeName(e.target.value))
+                        }
+                        required
+                      />
+                      <Button
+                        className="w-full"
+                        variant={"outline"}
+                        onClick={handleVerify}
+                      >
+                        Verificar
+                      </Button>
+
+                      {matriculaVerufy && (
+                        <Label
+                          htmlFor="matricula"
+                          className="text-lg  flex flex-col gap-2"
+                        >
+                          <span className="text-basic text-yellow-500">
+                            <span className="text-gray-50 mr-2">
+                              {" "}
+                              Nº Matricula:
+                            </span>
+                            {matriculaVerufy}
+                          </span>
+                          <Button
+                            className="w-full bg-[#151526] hover:bg-[#151526]/80 "
+                            variant={"default"}
+                            onClick={handleCopyMatricula}
+                          >
+                            Copiar matricula
+                          </Button>
+                        </Label>
+                      )}
+                    </SheetDescription>
+                  </SheetHeader>
+                </SheetContent>
+              </Sheet>
+            </span>
           </Label>
 
           <Label

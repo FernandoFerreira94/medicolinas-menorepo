@@ -4,6 +4,6 @@
     "outDir": "dist",
     "composite": true
   },
-  "include": ["src", "index.ts", "src/hook/useUser.tsx"],
+  "include": ["src", "index.ts", "src/hook/useFetchUser.tsx"],
   "exclude": ["node_modules"]
 }

@@ -1,5 +1,3 @@
-// services/fetchLojasWithMedidores.ts
-
 import { supabase } from "../supabase";
 import type { LojaComMedidores } from "../types";
 
@@ -10,60 +8,94 @@ export async function fetchLojas(
   localidade: string | null = null,
   searchQuery: string | null = null
 ): Promise<LojaComMedidores[] | null> {
-  let query = supabase.from("lojas").select(`
-    id,
-    nome_loja,
-    numero_loja,
-    ativa,
-    tem_energia,
-    tem_agua,
-    tem_gas,
-    complexo,
-    prefixo_loja,
-    medidores (
+  const baseQuery = () => {
+    let query = supabase.from("lojas").select(`
       id,
-      tipo_medicao,
-      localidade,
-      numero_relogio,
-      ultima_leitura,
-      detalhes,
-      leituras (
-        leitura_atual,
-        consumo_mensal,
-        mes,
-        ano
+      nome_loja,
+      numero_loja,
+      ativa,
+      tem_energia,
+      tem_agua,
+      tem_gas,
+      complexo,
+      prefixo_loja,
+      medidores (
+        id,
+        tipo_medicao,
+        localidade,
+        numero_relogio,
+        ultima_leitura,
+        detalhes,
+        data_instalacao,
+        leituras (
+          leitura_atual,
+          consumo_mensal,
+          mes,
+          ano
+        )
       )
-    )
-  `);
+    `);
 
-  if (tipoMedicao) {
-    query = query.filter("medidores.tipo_medicao", "eq", tipoMedicao);
-  }
+    if (tipoMedicao) {
+      query = query.filter("medidores.tipo_medicao", "eq", tipoMedicao);
+    }
 
-  // Se a localidade existir E NÃO for "all", aplique o filtro.
-  if (localidade && localidade !== "all") {
-    query = query.filter("medidores.localidade", "eq", localidade);
-  }
+    if (localidade && localidade !== "all") {
+      query = query.filter("medidores.localidade", "eq", localidade);
+    }
 
-  if (mes && ano) {
-    query = query.filter("medidores.leituras.mes", "eq", mes);
-    query = query.filter("medidores.leituras.ano", "eq", ano);
-  }
+    if (mes && ano) {
+      query = query.filter("medidores.leituras.mes", "eq", mes);
+    }
 
-  // **CÓDIGO CORRIGIDO AQUI**
+    return query;
+  };
+
+  let data: LojaComMedidores[] | null = null;
+  let error: any = null;
+
   if (searchQuery) {
     const formattedQuery = `%${searchQuery.toLowerCase()}%`;
-    query = query.or(
-      `nome_loja.ilike.${formattedQuery},numero_loja.ilike.${formattedQuery}`
-    );
-  }
 
-  const { data, error } = await query;
+    // Consulta 1: Busca em campos da loja (nome, prefixo, número)
+    const { data: dataLojas, error: errorLojas } = await baseQuery().or(
+      `nome_loja.ilike.${formattedQuery},prefixo_loja.ilike.${formattedQuery},numero_loja.ilike.${formattedQuery}`
+    );
+
+    // Consulta 2: Busca por número de relógio
+    const { data: dataMedidores, error: errorMedidores } =
+      await baseQuery().filter(
+        "medidores.numero_relogio",
+        "ilike",
+        formattedQuery
+      );
+
+    if (errorLojas || errorMedidores) {
+      console.error(
+        "Erro na busca de lojas:",
+        errorLojas?.message || errorMedidores?.message
+      );
+      throw new Error(errorLojas?.message || errorMedidores?.message);
+    }
+
+    // Combina os resultados e remove duplicatas
+    const allResults = [...(dataLojas || []), ...(dataMedidores || [])];
+    const uniqueLojas = Array.from(new Set(allResults.map((l) => l.id))).map(
+      (id) => allResults.find((l) => l.id === id)
+    ) as LojaComMedidores[];
+
+    data = uniqueLojas;
+  } else {
+    // Se não houver busca, executa a query normal
+    const { data: normalData, error: normalError } = await baseQuery();
+    data = normalData as LojaComMedidores[];
+    error = normalError;
+  }
 
   if (error) {
     console.error("Erro ao buscar lojas, medidores e leituras:", error.message);
     throw new Error(error.message);
   }
 
-  return data as LojaComMedidores[];
+  return data;
 }

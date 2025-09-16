@@ -48,11 +48,10 @@ export async function CreateLojaService({ loja, medidores }: CreateLojaData) {
       medidorData = insertedMedidoresData;
     }
 
-    // Retorno de sucesso (sem a propriedade 'error')
     return { lojaData, medidorData };
   } catch (error) {
     console.error("Erro no serviço de criação da loja:", error);
-    // Relança o erro para ser capturado pelo hook useMutation
+
     throw error;
   }
 }

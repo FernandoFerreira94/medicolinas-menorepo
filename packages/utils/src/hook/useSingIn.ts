@@ -1,10 +1,8 @@
-// apps/web/src/hooks/useSignIn.ts
-
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import { signInService } from "../service/signInService";
-import { LoginProps, UsuarioProps } from "../types"; // Importe a interface LoginProps
 
-// Tipagem para o retorno da mutação
+import { signInService } from "../service/signInService";
+import { LoginProps, UsuarioProps } from "../types";
+
 interface SignInMutationReturn {
   auth: any;
   usuario: UsuarioProps[] | null;

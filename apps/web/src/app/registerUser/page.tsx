@@ -1,6 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Content } from "../../componente/content";
+import { toast } from "sonner";
+import { useRef } from "react";
+
+import { Content } from "../../_componente/content";
 import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 import {
@@ -16,27 +19,33 @@ import { useSignUp } from "@repo/utils";
 import type { UsuarioProps } from "@repo/utils";
 
 export default function Register() {
+  const formRef = useRef<HTMLFormElement>(null);
   const [funcao, setFuncao] = useState("");
   const [permissaoEnergia, setPermissaoEnergia] = useState(false);
   const [permissaoAgua, setPermissaoAgua] = useState(false);
   const [permissaoGas, setPermissaoGas] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  // Função para resetar todos os estados
   const resetFormFields = () => {
     setFuncao("");
     setPermissaoEnergia(false);
     setPermissaoAgua(false);
     setPermissaoGas(false);
     setIsAdmin(false);
+    if (formRef.current) {
+      formRef.current.reset();
+    }
   };
+
   const { mutate } = useSignUp({
     onSuccess: () => {
       resetFormFields();
 
-      alert("Cadastro realizado com sucesso!");
+      toast.success("Cadastro realizado com sucesso!");
     },
     onError: (error) => {
-      alert(error.message);
+      toast.error(error.message);
     },
   });
 
@@ -92,6 +101,7 @@ export default function Register() {
       <form
         onSubmit={handleSubmit}
         className="flex flex-col max-w-xl gap-4 mt-8"
+        ref={formRef}
       >
         <div className="grid w-full items-center gap-3">
           <Label htmlFor="nome_completo">Nome Completo</Label>

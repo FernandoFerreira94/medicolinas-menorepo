@@ -1,8 +1,8 @@
-// apps/web/src/hooks/useSignUp.ts
-
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
+
 import { signUp } from "../service/signUpService";
-import { UsuarioProps } from "../types"; // Importa a interface
+import { UsuarioProps } from "../types";
+import { toast } from "sonner";
 
 export function useSignUp(
   options?: UseMutationOptions<any, Error, UsuarioProps>
@@ -10,11 +10,12 @@ export function useSignUp(
   return useMutation({
     mutationFn: signUp,
     onSuccess: () => {
-      alert("Cadastro realizado com sucesso!");
+      toast.success("Cadastro realizado com sucesso!");
     },
     onError: (error) => {
-      alert(error.message);
+      toast.error("Ops algo deu errado! acione o suporte!");
+      console.error(error);
     },
-    ...options, // Garante que as opções adicionais sejam passadas corretamente
+    ...options,
   });
 }

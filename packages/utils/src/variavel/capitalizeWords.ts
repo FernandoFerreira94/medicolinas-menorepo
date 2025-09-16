@@ -1,3 +1,4 @@
+// Capitaliza as palavras de uma string
 export function capitalizeWords({ str }: { str: string }): string {
   if (!str) return "";
 

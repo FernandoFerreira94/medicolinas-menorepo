@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import Cookies from "js-cookie";
+
 import { fetchUser, UsuarioProps, supabase } from "../../index";
 
 type UserWithSession = {
@@ -28,7 +29,7 @@ const getUserData = async (): Promise<UserWithSession> => {
   };
 };
 
-export function useUser() {
+export function useFetchUser() {
   return useQuery<UserWithSession>({
     queryKey: ["user"],
     queryFn: getUserData,

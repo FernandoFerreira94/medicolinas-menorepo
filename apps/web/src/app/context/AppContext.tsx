@@ -23,6 +23,8 @@ interface AppContextType {
   setFirstName: (firstName: string) => void;
   searchQuery: string;
   setSearchQuery: (searchQuery: string) => void;
+  day: number;
+  setDay: (day: number) => void;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);

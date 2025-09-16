@@ -5,16 +5,17 @@ import {
   UseMutationOptions,
   useQueryClient,
 } from "@tanstack/react-query";
-import { CreateLeituraProps } from "../types";
-import { CreateLeitura } from "../service/CreateLeitura";
 import { toast } from "sonner";
 
+import { CreateLeitura } from "../service/CreateLeitura";
+import { CreateLeituraProps } from "../types";
+
 export function useCreateLeitura(
-  tipoMedicao: string | null = null,
-  mes: number | null = null,
-  ano: number | null = null,
-  localidade: string | null = null,
-  searchQuery: string | null = null,
+  tipoMedicao: string | null,
+  mes: number | null,
+  ano: number | null,
+  localidade: string | null,
+  searchQuery: string | null,
   options?: UseMutationOptions<any, Error, CreateLeituraProps>
 ) {
   const queryClient = useQueryClient();
@@ -50,7 +51,8 @@ export function useCreateLeitura(
       }
 
       // Chama o toast DEPOIS de tudo
-      toast.error("Erro ao cadastrar a leitura: " + error.message);
+      toast.error("Ops algo deu errado! acione o suporte!");
+      console.error(error);
     },
     ...options,
   });

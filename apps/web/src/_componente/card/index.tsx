@@ -14,11 +14,12 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useAppContext } from "@/src/app/context/useAppContext";
 import { toast } from "sonner";
-import { useCreateLeitura } from "@repo/utils";
+import { useCreateLeitura, useFetchUser } from "@repo/utils";
 import { ButtonLoading } from "@/components/ui/buttonLoading";
+import Link from "next/link";
 
 export function Card({ loja }: { loja: LojaComMedidores }) {
-  const { firstName, user, month, year, typeMedicao, localidade, searchQuery } =
+  const { firstName, month, year, typeMedicao, localidade, searchQuery, day } =
     useAppContext();
   const { mutate, isPending } = useCreateLeitura(
     typeMedicao,
@@ -27,6 +28,10 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
     localidade,
     searchQuery
   );
+
+  const { data } = useFetchUser();
+  const user = data?.user;
+
   const [isFormSheetOpen, setIsFormSheetOpen] = useState(false);
   const [isConfirmSheetOpen, setIsConfirmSheetOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -49,15 +54,17 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
 
   const handleNextStep = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    console.log(loja);
+
     if (!formData.medicao_atual || formData.medicao_atual <= 0) {
       toast.info("Por favor, preencha a medição atual com um valor válido.");
       return;
     }
 
-    if (formData.medicao_atual < medidor.ultima_leitura) {
-      toast.warning("A medição atual deve ser maior ou igual ao anterior.");
-      return;
+    if (!user.is_adm) {
+      if (formData.medicao_atual < medidor.ultima_leitura) {
+        toast.warning("A medição atual deve ser maior ou igual ao anterior.");
+        return;
+      }
     }
 
     setIsFormSheetOpen(false);
@@ -114,9 +121,17 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
 
   const verif = verifiGasto();
 
+  // CORREÇÃO: Nova lógica para verificar se a leitura já foi feita no mês
+  const medidorJaLidoNoMes = medidor.leituras.some(
+    (leitura) => leitura.mes === month && leitura.ano === year
+  );
+
+  // CORREÇÃO: A lógica para desabilitar o botão
+  const shouldDisableButton = medidorJaLidoNoMes || 26 < 25;
+
   return (
     <div
-      className={`border-l-8  ${isMedidorVerified ? "border-green-500" : "border-red-500"} flex flex-col w-75 h-45 gap-1 justify-between py-2 px-4 rounded-xl text-gray-900 dark:text-gray-50
+      className={`border-l-8  ${isMedidorVerified ? "border-green-500" : "border-red-500"} flex flex-col w-75 h-45 gap-1 justify-between py-2 px-4 rounded-xl text-gray-900 dark:text-gray-50 mr-8 mb-8
       bg-white dark:bg-[#151526] hover:shadow-[2px_2px_10px_4px_#A7B3C3,-2px_-2px_10px_#FFFFFF] transition-shadow duration-300 shadow-xl`}
       key={loja.id}
     >
@@ -148,17 +163,20 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
 
       <div className="w-full flex justify-between gap-6">
         <Button variant="outline" className="h-8 w-full">
-          Info
+          <Link href={`/loja/${loja.id}/${loja.medidores[0].id}`}>
+            Detalhes
+          </Link>
         </Button>
 
-        {/* --- Primeiro Sheet: Formulário de Medição --- */}
         <Sheet open={isFormSheetOpen} onOpenChange={setIsFormSheetOpen}>
           <SheetTrigger asChild>
-            <Button className="w-full h-8 ">Medição</Button>
+            <Button disabled={shouldDisableButton} className="w-full h-8 ">
+              Medição
+            </Button>
           </SheetTrigger>
-          <SheetContent className="w-8/12">
-            <SheetHeader>
-              <SheetTitle className="text-2xl font-semibold">
+          <SheetContent className="w-8/12  h-full">
+            <SheetHeader className=" h-full">
+              <SheetTitle className="text-2xl font-semiboldborder">
                 Registrar medição
               </SheetTitle>
               <SheetTitle className="flex justify-between items-center mt-4">
@@ -170,8 +188,8 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
                 ></span>
               </SheetTitle>
 
-              <SheetDescription asChild className="text-gray-50">
-                <div className="text-gray-50 flex-col flex gap-4 mt-8">
+              <SheetDescription asChild className="text-gray-50 h-full ">
+                <div className="text-gray-50 flex-col flex gap-4 mt-8  ">
                   <div className="flex flex-col gap-2">
                     <span className="font-semibold text-lg">Complexo</span>
                     <Label>{loja.complexo}</Label>
@@ -236,7 +254,7 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
 
                   <Button
                     onClick={handleNextStep}
-                    className="w-full mt-4"
+                    className="w-full  mt-auto"
                     variant={"outline"}
                   >
                     Registrar medição
