@@ -19,7 +19,7 @@ import { ButtonLoading } from "@/components/ui/buttonLoading";
 import Link from "next/link";
 
 export function Card({ loja }: { loja: LojaComMedidores }) {
-  const { firstName, month, year, typeMedicao, localidade, searchQuery, day } =
+  const { firstName, month, year, typeMedicao, localidade, searchQuery } =
     useAppContext();
   const { mutate, isPending } = useCreateLeitura(
     typeMedicao,

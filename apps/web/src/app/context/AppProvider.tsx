@@ -17,10 +17,9 @@ const currentDate = `${currentDay}/${currentMonth}/${currentYear}`;
 export function AppProvider({ children }: AppProviderProps) {
   const [queryClient] = useState(() => new QueryClient());
   const [showSideBar, setShowSideBar] = useState<boolean>(false);
+  const [token, setToken] = useState<string>("");
   const [user, setUser] = useState<UsuarioProps | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [dateFull, setDateFull] = useState<string>(currentDate);
-  const [day, setDay] = useState<number>(currentDay);
   const [month, setMonth] = useState<number>(currentMonth);
   const [year, setYear] = useState<number>(currentYear);
   const [typeMedicao, setTypeMedicao] = useState<string>("");
@@ -47,6 +46,7 @@ export function AppProvider({ children }: AppProviderProps) {
         setShowSideBar,
         user,
         setUser,
+
         token,
         setToken,
         dateFull,
@@ -63,8 +63,6 @@ export function AppProvider({ children }: AppProviderProps) {
         setFirstName,
         searchQuery,
         setSearchQuery,
-        day,
-        setDay,
       }}
     >
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>

@@ -18,3 +18,6 @@ export * from "./src/hook/useCreateLeitura";
 export * from "./src/service/CreateLeitura";
 export * from "./src/variavel/normalizeName";
 export * from "./src/hook/useFetchLojaSingle";
+export * from "./src/service/fetchLojaSingle";
+export * from "./src/hook/useFetchAllUsers";
+export * from "./src/service/fetchAllUsers";

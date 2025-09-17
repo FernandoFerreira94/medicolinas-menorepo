@@ -23,20 +23,34 @@ import { useAppContext } from "../../app/context/useAppContext";
 import { Li } from "../../_componente/Li";
 import LogoI from "../../assets/IconsIwhite.png";
 import Logo from "../../assets/LogoWhite.png";
-import { roxoPrimary, roxoDark } from "@repo/utils";
-import { SheetEditUser } from "../sheetEditUser";
+import {
+  roxoPrimary,
+  roxoDark,
+  useFetchUser,
+  useFetchAllUsers,
+} from "@repo/utils";
+import { Button } from "@/components/ui/button";
 
 export function SideBar() {
-  const { showSideBar, setUser, setToken, user } = useAppContext();
+  const { showSideBar, setUser } = useAppContext();
   const router = useRouter();
   const { setTheme } = useTheme();
   function handleLogout() {
     setUser(null);
-    setToken(null);
     Cookies.remove("auth_token");
     router.push("/");
     setTheme("light");
   }
+
+  const { data } = useFetchUser();
+  const { data: userAll } = useFetchAllUsers();
+
+  if (!data) {
+    return <>Buscando usuario</>;
+  }
+
+  console.log(userAll);
+  const user = data.user;
 
   return (
     <nav
@@ -130,8 +144,20 @@ export function SideBar() {
                 <SheetContent side={"left"}>
                   <SheetHeader>
                     <SheetTitle>Selecione o usuario</SheetTitle>
+                    <SheetTitle className="w-full flex justify-between px-4 my-2">
+                      <span>{}</span>Função
+                    </SheetTitle>
                     <SheetDescription>
-                      
+                      {userAll?.map((user) => (
+                        <Button
+                          key={user.id}
+                          variant={"ghost"}
+                          className="w-full text-gray-50 border flex justify-between px-4"
+                        >
+                          <span>{user.nome_completo} </span>
+                          <span>{user.funcao}</span>
+                        </Button>
+                      ))}
                     </SheetDescription>
                   </SheetHeader>
                   {/* ... conteúdo da Sheet de edição ... */}

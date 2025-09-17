@@ -32,7 +32,7 @@ export async function signUp({
     .from("usuarios")
     .insert([
       {
-        id: userId,
+        user_id: userId,
         nome_completo,
         cpf,
         matricula,

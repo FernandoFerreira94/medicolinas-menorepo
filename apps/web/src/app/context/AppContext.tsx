@@ -7,8 +7,6 @@ interface AppContextType {
   setShowSideBar: (showSideBar: boolean) => void;
   user: UsuarioProps | null;
   setUser: (user: UsuarioProps | null) => void;
-  token: string | null;
-  setToken: (token: string | null) => void;
   dateFull: string;
   setDateFull: (date: string) => void;
   month: number;
@@ -23,8 +21,8 @@ interface AppContextType {
   setFirstName: (firstName: string) => void;
   searchQuery: string;
   setSearchQuery: (searchQuery: string) => void;
-  day: number;
-  setDay: (day: number) => void;
+  token: string;
+  setToken: (token: string) => void;
 }
 
 export const AppContext = createContext<AppContextType | undefined>(undefined);

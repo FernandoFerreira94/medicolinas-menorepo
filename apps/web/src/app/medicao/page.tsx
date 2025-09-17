@@ -96,8 +96,6 @@ export default function Dashboard() {
     }
   }, [filteredLojas]);
 
-  console.log(data);
-
   return (
     <Content title="Painel medição">
       <section className="w-full flex">
