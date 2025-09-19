@@ -1,7 +1,6 @@
 // apps/web/src/componente/content/index.tsx
 
 "use client";
-import { useState, useEffect } from "react";
 import { MdOutlineToggleOff, MdToggleOn } from "react-icons/md";
 import { useAppContext } from "../../app/context/useAppContext";
 import { SideBar } from "../../_componente/sideBar";
@@ -18,17 +17,10 @@ export function Content({
   title: string;
 }) {
   const { showSideBar, setShowSideBar } = useAppContext();
-  const [firstName, setFirstName] = useState<string>("");
   const { data } = useFetchUser();
 
   const user = data?.user;
-  const currentName = user?.nome_completo.split(" ")[0];
-
-  useEffect(() => {
-    if (currentName) {
-      setFirstName(currentName);
-    }
-  }, [currentName]);
+  const firstName = user?.nome_completo.split(" ")[0];
 
   return (
     <main className="h-full text-gray-900 dark:text-gray-50">

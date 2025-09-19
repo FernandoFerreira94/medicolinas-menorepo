@@ -10,6 +10,7 @@ export interface UsuarioProps {
   permissao_agua: boolean;
   permissao_gas: boolean;
   funcao: string;
+  created_at?: string;
 }
 
 export interface LoginProps {
@@ -85,9 +86,7 @@ export interface CreateLeituraProps {
   ano: number;
   leitura_anterior: number;
   leitura_atual: number;
-  consumo_mensal: number;
   foto_url: string | null;
-  lida_por_usuario_id?: string;
   nome_usuario: string;
   detalhes_leitura: string | null;
 }
@@ -114,4 +113,44 @@ export interface LojaComMedidores {
   tem_agua: boolean;
   tem_gas: boolean;
   medidores: Medidor[] | MedidorComLeitura[]; // Tipagem ajustada para flexibilidade
+}
+
+export interface DetalhesProps {
+  params: Promise<{
+    id: string;
+    medidorId: string;
+  }>;
+}
+
+export interface ChartDataItem {
+  consumo: number;
+  detalhes: string;
+  month: string;
+}
+
+export interface TooltipPayload {
+  active?: boolean;
+  label?: string;
+  payload?: {
+    payload: ChartDataItem;
+    value: number;
+  }[];
+}
+
+export interface EditLeitura {
+  leitura_atual?: number | null;
+  detalhes_leitura?: string | null;
+}
+
+export interface EditMedidor {
+  localidade: string;
+  numero_relogio: string;
+  quadro_distribuicao?: string | null;
+  ultima_leitura?: number;
+}
+
+export interface EditLoja {
+  nome_loja: string;
+  numero_loja: string;
+  prefixo_loja: string;
 }

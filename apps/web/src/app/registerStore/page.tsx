@@ -21,7 +21,7 @@ import { useCreateLoja, capitalizeWords } from "@repo/utils";
 import { ButtonLoading } from "@/components/ui/buttonLoading";
 
 export default function RegisterStore() {
-  // Use useRef para referenciar o formulário
+  
   const formRef = useRef<HTMLFormElement>(null);
 
   const [complexo, setComplexo] = useState("Shopping Colinas");
@@ -51,14 +51,13 @@ export default function RegisterStore() {
   };
 
   const { mutate, isPending } = useCreateLoja({
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success("Loja cadastrada com sucesso!");
-      console.log(data);
-      resetForm(); // Chame a função de reset aqui
+    
+      resetForm();
     },
     onError: (error) => {
-      toast.error("Ops algo deu errado! acione o suporte!");
-      console.log(error);
+      toast.error(error.message);
     },
   });
 

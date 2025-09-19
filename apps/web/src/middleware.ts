@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { useFetchUser } from "@repo/utils";
 
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get("auth_token")?.value;

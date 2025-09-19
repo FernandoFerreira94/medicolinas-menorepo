@@ -15,10 +15,13 @@ import {
 } from "../../../components/ui/select";
 import { Switch } from "../../../components/ui/switch";
 import { Button } from "../../../components/ui/button";
-import { useSignUp } from "@repo/utils";
-import type { UsuarioProps } from "@repo/utils";
+import { UsuarioProps, queryKeys } from "@repo/utils";
+import { useSignUp } from "@/src/hook/useSignUp";
+import { Loader2Icon } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Register() {
+  const queryClient = useQueryClient();
   const formRef = useRef<HTMLFormElement>(null);
   const [funcao, setFuncao] = useState("");
   const [permissaoEnergia, setPermissaoEnergia] = useState(false);
@@ -29,6 +32,7 @@ export default function Register() {
   // Função para resetar todos os estados
   const resetFormFields = () => {
     setFuncao("");
+    setFuncao("");
     setPermissaoEnergia(false);
     setPermissaoAgua(false);
     setPermissaoGas(false);
@@ -38,11 +42,11 @@ export default function Register() {
     }
   };
 
-  const { mutate } = useSignUp({
-    onSuccess: () => {
+  const { mutate, isPending } = useSignUp({
+    onSuccess: (data) => {
+      toast.success(`Usuario: ${data.nome_completo} cadastrado com sucesso!`);
+      queryClient.invalidateQueries({ queryKey: queryKeys.allUsers() });
       resetFormFields();
-
-      toast.success("Cadastro realizado com sucesso!");
     },
     onError: (error) => {
       toast.error(error.message);
@@ -55,6 +59,11 @@ export default function Register() {
     const nome_completo = formData.get("nome_completo") as string;
     const matricula = formData.get("matricula") as string;
     const cpf = formData.get("cpf") as string;
+
+    if (!funcao) {
+      toast.error("Selecione uma função!");
+      return;
+    }
 
     const userData: UsuarioProps = {
       nome_completo: nome_completo as string,
@@ -115,7 +124,7 @@ export default function Register() {
         </div>
         <div className="grid w-full items-center gap-3">
           <Label htmlFor="funcao">Função</Label>
-          <Select onValueChange={setFuncao} required>
+          <Select onValueChange={setFuncao} value={funcao} required>
             <SelectTrigger className="">
               <SelectValue placeholder="Selecione a função" />
             </SelectTrigger>
@@ -186,7 +195,13 @@ export default function Register() {
           <Label htmlFor="isAdmin">Usuário Administrador</Label>
         </div>
         <Button type="submit" variant="default">
-          Cadastrar
+          {isPending ? (
+            <>
+              Cadastrando <Loader2Icon className="animate-spin" />
+            </>
+          ) : (
+            "Cadastrar"
+          )}
         </Button>
       </form>
     </Content>

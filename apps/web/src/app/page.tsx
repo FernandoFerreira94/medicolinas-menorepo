@@ -3,13 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-
+import { toast } from "sonner";
+import { Loader2Icon } from "lucide-react";
 import { SplashScreen } from "../_componente/splashScreen";
 import Logo from "@/src/assets/Logo.png";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
-import { ButtonLoading } from "../../components/ui/buttonLoading";
 import { useAppContext } from "./context/useAppContext";
 import Cookie from "js-cookie";
 import {
@@ -20,25 +20,25 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { toast } from "sonner";
 import { recoverRegistration, normalizeName, useSignIn } from "@repo/utils";
 
 export default function Login() {
-  const { setToken } = useAppContext();
+  const { setToken, setUser } = useAppContext();
   const [matriculaVerufy, setMatriculaVerufy] = useState("");
   const [nomeCompleto, setNomeCompleto] = useState("");
   const router = useRouter();
+
   const { mutate, isPending } = useSignIn({
     onSuccess: (data) => {
       setToken(data.session.access_token);
+      setUser(data.user);
       Cookie.set("auth_token", data.session.access_token, { expires: 7 });
 
       router.push("/medicao");
     },
     onError: (error) => {
-      alert(`Erro no login: ${error.message}`);
-      setToken(null);
-
+      toast.error(`Erro no login: ${error.message}`);
+      setToken("");
       Cookie.set("auth_token", "", { expires: 7 });
     },
   });
@@ -48,11 +48,11 @@ export default function Login() {
     // const formData = new FormData(event.currentTarget);
     //const matricula = formData.get("matricula") as string;
     //const password = formData.get("password") as string;
-    const matricula = "123456";
+    const matricula = "155157";
     const password = "454184";
 
     if (!matricula || !password) {
-      alert("Por favor, preencha todos os campos.");
+      toast.warning("Por favor, preencha todos os campos.");
       return;
     }
 
@@ -61,10 +61,15 @@ export default function Login() {
 
   async function handleVerify() {
     const result = await recoverRegistration(nomeCompleto);
+    if (typeof result === "object" && result?.error) {
+      toast.warning(result.error);
+      setMatriculaVerufy("");
+      return;
+    }
     if (result) {
       setMatriculaVerufy(result);
     } else {
-      toast("Usuário não encontrado!");
+      toast.warning("Usuário não encontrado!");
       setMatriculaVerufy("");
     }
   }
@@ -74,11 +79,11 @@ export default function Login() {
       navigator.clipboard
         .writeText(matriculaVerufy)
         .then(() => {
-          toast.success("Matrícula copiada com sucesso!");
+          toast.info("Matrícula copiada com sucesso!");
         })
         .catch((err) => {
-          console.error("Erro ao copiar a matrícula: ", err);
-          toast.error("Erro ao copiar a matrícula.");
+          console.error("Erro ao copiar a matrícula: ", err.message);
+          toast.error("Erro ao copiar a matrícula." + err.message);
         });
     }
   };
@@ -189,11 +194,15 @@ export default function Login() {
             />
           </Label>
 
-          {isPending ? (
-            <ButtonLoading />
-          ) : (
-            <Button type="submit">Acessar</Button>
-          )}
+          <Button type="submit">
+            {isPending ? (
+              <>
+                Acessando <Loader2Icon className="animate-spin" />
+              </>
+            ) : (
+              "Acessar"
+            )}
+          </Button>
         </form>
       </div>
 

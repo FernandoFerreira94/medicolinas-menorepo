@@ -27,9 +27,6 @@ export function useCreateLeitura(
     },
     onSuccess: (data, variables, context) => {
       // Invalida a query
-      queryClient.invalidateQueries({
-        queryKey: ["medicoes", tipoMedicao, mes, ano, localidade, searchQuery],
-      });
 
       // Chama a função onSuccess do componente, se houver
       if (options?.onSuccess) {
@@ -37,7 +34,9 @@ export function useCreateLeitura(
       }
 
       // Chama o toast DEPOIS de tudo
-      toast.success("Leitura cadastrada com sucesso!");
+      toast.success(
+        `Leitura da loja ${data.loja.nome_loja} cadastrada com sucesso!`
+      );
     },
     onError: (error, variables, context) => {
       // Invalida a query

@@ -45,12 +45,7 @@ export function SideBar() {
   const { data } = useFetchUser();
   const { data: userAll } = useFetchAllUsers();
 
-  if (!data) {
-    return <>Buscando usuario</>;
-  }
-
-  console.log(userAll);
-  const user = data.user;
+  const user = data?.user;
 
   return (
     <nav
@@ -105,10 +100,7 @@ export function SideBar() {
                 {showSideBar && <span>Cadastrar loja</span>}
               </Link>
             </Li>
-            <Li title="Editar loja">
-              <MdStore size={26} className="text-gray-100 " />{" "}
-              {showSideBar && <span>Editar loja</span>}
-            </Li>
+
             <Li title="Cadastrar usuário">
               <Link
                 href="/registerUser"
@@ -145,17 +137,26 @@ export function SideBar() {
                   <SheetHeader>
                     <SheetTitle>Selecione o usuario</SheetTitle>
                     <SheetTitle className="w-full flex justify-between px-4 my-2">
-                      <span>{}</span>Função
+                      <span>Nome</span>Função
                     </SheetTitle>
-                    <SheetDescription>
+                    <SheetDescription className="w-full flex flex-col  gap-4 pt-4">
                       {userAll?.map((user) => (
                         <Button
-                          key={user.id}
-                          variant={"ghost"}
-                          className="w-full text-gray-50 border flex justify-between px-4"
+                          key={user.user_id}
+                          variant={"outline"}
+                          className="w-full "
                         >
-                          <span>{user.nome_completo} </span>
-                          <span>{user.funcao}</span>
+                          <Link
+                            href={`/editUser/${user.user_id}`}
+                            className="w-full h-full flex justify-between items-center px-4"
+                          >
+                            <span title={user.nome_completo}>
+                              {user.nome_completo.length > 15
+                                ? user.nome_completo.slice(0, 20) + "..."
+                                : user.nome_completo}
+                            </span>
+                            <span title={user.funcao}>{user.funcao}</span>
+                          </Link>
                         </Button>
                       ))}
                     </SheetDescription>

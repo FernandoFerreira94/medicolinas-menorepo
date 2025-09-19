@@ -1,10 +1,16 @@
 import { supabase } from "../supabase";
+import { UsuarioProps } from "../types";
 
 export async function fetchAllUsers() {
-  const { data, error } = await supabase.from("usuarios").select("*");
-  if (error) {
-    console.error("Erro ao buscar usuários:", error.message);
-    return null;
+  try {
+    const { data, error } = await supabase.from("usuarios").select("*");
+
+    if (error) {
+      throw new Error("Erro ao buscar usuários");
+    }
+    return data as UsuarioProps[];
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    throw new Error(errorMessage); // <-- lance o erro aqui
   }
-  return data;
 }

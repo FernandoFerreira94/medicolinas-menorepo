@@ -1,6 +1,6 @@
 // src/hooks/useSignUp.ts ou onde seu hook estiver
 import { useMutation, UseMutationOptions } from "@tanstack/react-query";
-import type { UsuarioProps } from "../types";
+import type { UsuarioProps } from "@repo/utils";
 
 // A função que vai chamar a API. É a nova mutationFn.
 async function signUp(userData: UsuarioProps) {
@@ -21,7 +21,7 @@ async function signUp(userData: UsuarioProps) {
 }
 
 export function useSignUp(
-  options?: UseMutationOptions<any, Error, UsuarioProps>
+  options?: UseMutationOptions<UsuarioProps, Error, UsuarioProps>
 ) {
   return useMutation({
     mutationFn: signUp,

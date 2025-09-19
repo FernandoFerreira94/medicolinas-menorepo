@@ -8,9 +8,9 @@ import {
   Tooltip,
   LabelList,
 } from "recharts";
-import { ChartConfig, ChartContainer } from "@/components/ui/chart";
-import React from "react";
-
+import { Loader2Icon } from "lucide-react";
+import { ChartContainer } from "@/components/ui/chart";
+import React, { useState, useEffect } from "react";
 import { Content } from "@/src/_componente/content";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
@@ -22,55 +22,81 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
-import { useFetchLojaSingle } from "@repo/utils";
+import {
+  useFetchLojaSingle,
+  DetalhesProps,
+  ChartDataItem,
+  useFetchUser,
+  useEditLeituraMedidor,
+} from "@repo/utils";
+import { Input } from "@/components/ui/input";
+import { Localidade } from "@/src/_componente/dateTipoMedicao/localidade";
+import { CustomTooltip, chartConfig } from "./CustomTooltip";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 
-interface DetalhesProps {
-  params: Promise<{
-    id: string;
-    medidorId: string;
-  }>;
-}
-
-const chartConfig = {
-  consumo: {
-    label: "Consumo Mensal",
-    color: "#3D3C6C",
-  },
-} satisfies ChartConfig;
-
-const CustomTooltip = ({
-  active,
-  payload,
-  label,
-}: {
-  active?: boolean;
-  payload?: any;
-  label?: string;
-}) => {
-  if (active && payload && payload.length) {
-    // O payload é um array de objetos, um para cada Bar ou Line no gráfico
-    const data = payload[0].payload;
-
-    return (
-      <div className="bg-[#151526] border border-gray-700 p-3 rounded shadow-lg text-sm text-gray-200">
-        <p className="font-semibold">{`Mês: ${label}`}</p>
-        <p className="font-bold text-lg text-blue-400">{`Consumo: ${data.consumo}`}</p>
-        {/* Aqui você adiciona a sua mensagem de detalhe */}
-        <p className="text-gray-400 mt-2">Detalhes : {data.detalhes}</p>
-      </div>
-    );
-  }
-  return null;
-};
+import { useAppContext } from "@/src/app/context/useAppContext";
+import { toast } from "sonner";
 
 export default function InfoLoja({ params }: DetalhesProps) {
   const resolvedParams = React.use(params);
   const { id, medidorId } = resolvedParams;
+  const { month, year } = useAppContext();
+  const [edit, setEdit] = useState(true);
+  const [numero_relogio, setNumero_relogio] = useState("");
+  const [quadroDistribuicao, setQuadroDistribuicao] = useState("");
+  const [localidade, setLocalidade] = useState("");
+  const [leitura_atual, setLeitura_atual] = useState<string>("");
+  const [detalheLeitura, setDetalheLeitura] = useState("");
+  const [ativa, setAtiva] = useState(false);
+  const [nome_loja, setNome_loja] = useState("");
+  const [numero_loja, setNumero_loja] = useState("");
+  const [prefixo, setPrefixo] = useState("");
 
   const { data, isLoading, error } = useFetchLojaSingle(id, medidorId);
   console.log(data);
+  const { mutate, isPending } = useEditLeituraMedidor({
+    onSuccess: () => {
+      toast.success(
+        `Loja ${data?.loja?.nome_loja} - ${data?.loja?.prefixo_loja}-${data?.loja?.numero_loja} editada com sucesso!`
+      );
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+  const { data: userData } = useFetchUser();
+
+  const is_admin = userData?.user?.is_adm;
+
+  useEffect(() => {
+    if (data) {
+      setNumero_relogio(data.medidor.numero_relogio);
+      setLeitura_atual(
+        data.medidor.leituras[0]?.leitura_atual || "Sem leitura"
+      );
+      setDetalheLeitura(
+        data.medidor.leituras[0]?.detalhes_leitura || "Nenhum detalhe"
+      );
+      setAtiva(data.loja.ativa);
+      setQuadroDistribuicao(data?.medidor?.quadro_distribuicao || "");
+    }
+    setNome_loja(data?.loja?.nome_loja || "");
+    setNumero_loja(data?.loja?.numero_loja || "");
+    setPrefixo(data?.loja?.prefixo_loja || "");
+  }, [data]);
+
+  useEffect(() => {
+    if (data?.medidor.localidade || data?.loja.prefixo_loja) {
+      setLocalidade("");
+      setPrefixo("");
+      setTimeout(() => {
+        (setLocalidade(data.medidor.localidade),
+          setPrefixo(data.loja.prefixo_loja));
+      }, 0); // aplica depois
+    }
+  }, [data?.medidor.localidade]);
+
   if (!data) {
     return (
       <Content title={` `}>
@@ -79,32 +105,19 @@ export default function InfoLoja({ params }: DetalhesProps) {
     );
   }
 
-  // teste para visualizar
-  /*
-  const chartData = [
-    { month: "04/2025", consumo: 350 },
-    { month: "05/2025", consumo: 420 },
-    { month: "06/2025", consumo: 380 },
-    { month: "07/2025", consumo: 450 },
-    { month: "08/2025", consumo: 410 },
-    { month: "09/2025", consumo: 490 },
-  ];
-  */
-  let chartData: { month: string; consumo: number }[] = [];
+  let chartData: ChartDataItem[] = [];
   if (data && data.medidor.leituras) {
-    // Ordena as leituras da mais antiga para a mais recente
     const sortedLeituras = [...data.medidor.leituras].sort((a, b) => {
       const dateA = new Date(a.ano, a.mes - 1, 1);
       const dateB = new Date(b.ano, b.mes - 1, 1);
       return dateA.getTime() - dateB.getTime();
     });
-    // Pega as 6 últimas leituras e formata para o gráfico
-    const lastSixLeituras = sortedLeituras.slice(-6);
 
+    const lastSixLeituras = sortedLeituras.slice(-6);
     chartData = lastSixLeituras.map((leitura) => ({
       month: `${leitura.mes}/${leitura.ano}`,
       consumo: leitura.consumo_mensal,
-      detalhes: leitura.detalhes_leitura,
+      detalhes: leitura.detalhes_leitura || "Nenhum detalhe disponível",
     }));
   }
 
@@ -116,82 +129,239 @@ export default function InfoLoja({ params }: DetalhesProps) {
     );
   }
 
+  const leitura_id = data?.medidor?.leituras[0]?.id;
+  const loja_id = data?.loja?.id;
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    // Dados que sempre são enviados
+    const dataMedidor = {
+      numero_relogio,
+      localidade,
+      quadro_distribuicao: quadroDistribuicao,
+      ultima_leitura: Number(leitura_atual),
+    };
+
+    const dataLoja = {
+      nome_loja,
+      numero_loja,
+      prefixo_loja: prefixo,
+    };
+
+    // ✅ CORREÇÃO: Use a lógica de if/else para chamar a mutação
+    if (data?.medidor.leituras.length > 0) {
+      const dataLeitura = {
+        leitura_atual: Number(leitura_atual),
+        detalhes_leitura: detalheLeitura,
+      };
+      mutate({
+        medidor_id: data?.medidor?.id,
+        loja_id,
+        dataMedidor,
+        dataLoja,
+        leitura_id,
+        dataLeitura,
+      });
+    } else {
+      // Se não houver leitura, chame a mutação sem os dados de leitura
+      mutate({
+        medidor_id: data?.medidor?.id,
+        loja_id,
+        dataMedidor,
+        dataLoja,
+      });
+    }
+  }
+  console.log(data);
   return (
     <Content
-      title={`${data.loja.nome_loja} - ${data.loja.prefixo_loja} ${data.loja.numero_loja}`}
+      title={`${data.loja.nome_loja} - ${data.loja.prefixo_loja} ${data.loja.numero_loja} - Mês referente ${month}/${year}`}
     >
-      <main className="flex flex-col gap-12 pt-8 w-full md:w-2/5">
-        <section className="w-full flex flex-col gap-4">
-          <div className="flex flex-col gap-2">
-            <Label>Complexo</Label>
-            <Select required value={data.loja.complexo}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="Shopping Colinas">
-                  Shopping Colinas
-                </SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Switch id="ativa" checked={data.loja.ativa} />
-            {data.loja.ativa ? (
-              <Label htmlFor="ativa">Esta loja esta ativa</Label>
-            ) : (
-              <Label htmlFor="ativa">Esta loja esta desativada</Label>
+      <main className="flex  items-center pt-8 gap-32 w-11/12 ">
+        <section className="w-full ">
+          <div className="flex items-center  space-x-2 ">
+            {is_admin && (
+              <>
+                <Switch
+                  id="ativa"
+                  onCheckedChange={() => setEdit(!edit)}
+                  checked={!edit}
+                />
+                <Label htmlFor="edit">Modo editar</Label>
+              </>
             )}
           </div>
-          <div className="flex flex-col gap-2">
-            <Label>Tipo de Medicao</Label>
-            <span className="dark:bg-[#151526] border py-2 px-4 rounded-md bg-white">
-              {data.medidor.tipo_medicao}
-            </span>
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label>Numero do relogio</Label>
-            <span className="dark:bg-[#151526] border py-2 px-4 rounded-md bg-white">
-              {data.medidor.numero_relogio}
-            </span>{" "}
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label>localidade relogio</Label>
-            <span className="dark:bg-[#151526] border py-2 px-4 rounded-md bg-white">
-              {data.medidor.localidade}
-            </span>{" "}
-          </div>
-
-          {data.medidor.tipo_medicao === "Energia" && (
+          <form
+            onSubmit={handleSubmit}
+            className="w-full flex flex-col gap-4 mt-8"
+          >
             <div className="flex flex-col gap-2">
-              <Label>Quadro distribuição</Label>
+              <Label>Complexo</Label>
+              <Select required value={data.loja.complexo}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Shopping Colinas">
+                    Shopping Colinas
+                  </SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="ativa"
+                checked={ativa}
+                onCheckedChange={setAtiva}
+                disabled={edit}
+              />
+              {ativa ? (
+                <Label htmlFor="ativa">Esta loja esta ativa</Label>
+              ) : (
+                <Label htmlFor="ativa">Esta loja esta desativada</Label>
+              )}
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label>Nome da loja</Label>
+              <Input
+                disabled={edit}
+                value={nome_loja}
+                onChange={(e) => setNome_loja(e.target.value)}
+                className={`border-3 ${edit ? "border-transparent " : "border-gray-700 dark:border-gray-300 "}`}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label>Prefixo loja</Label>
+              <Select required value={prefixo} onValueChange={setPrefixo}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="NT">NT</SelectItem>
+                  <SelectItem value="NS">NS</SelectItem>
+                  <SelectItem value="QT">QT</SelectItem>
+                  <SelectItem value="QS">QS</SelectItem>
+                  <SelectItem value=" ">outros</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label>Numero loja</Label>
+              <Input
+                disabled={edit}
+                value={numero_loja}
+                onChange={(e) => setNumero_loja(e.target.value)}
+                className={`border-3 ${edit ? "border-transparent " : "border-gray-700 dark:border-gray-300 "}`}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label>Tipo de Medicao</Label>
               <span className="dark:bg-[#151526] border py-2 px-4 rounded-md bg-white">
-                ?????
+                {data.medidor.tipo_medicao}
+              </span>
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label>Numero do relogio</Label>
+              <Input
+                disabled={edit}
+                value={numero_relogio}
+                onChange={(e) => setNumero_relogio(e.target.value)}
+                className={`border-3 ${edit ? "border-transparent " : "border-gray-700 dark:border-gray-300 "}`}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label>localidade relogio</Label>
+              <Localidade
+                key={data.medidor.localidade}
+                setValue={(value) => setLocalidade(value)}
+                value={localidade}
+                disabled={edit}
+              />
+            </div>
+            {data.medidor.tipo_medicao === "Energia" && (
+              <div className="flex flex-col gap-2">
+                <Label>Quadro distribuição</Label>
+                <Input
+                  disabled={edit}
+                  value={quadroDistribuicao}
+                  onChange={(e) => setQuadroDistribuicao(e.target.value)}
+                  placeholder="Quadro Distribuição"
+                  className={`border-3 ${edit ? "border-transparent " : "border-gray-700 dark:border-gray-300 "}`}
+                />
+              </div>
+            )}
+            <div className="flex flex-col gap-2">
+              <Label>Leitura mês anterior</Label>
+              <span className="dark:bg-[#151526] border py-2 px-4 rounded-md bg-white">
+                {data.medidor.leituras.length === 0
+                  ? data.medidor.ultima_leitura
+                  : data.medidor.leituras[0].leitura_anterior}
               </span>{" "}
             </div>
-          )}
-          <div className="flex flex-col gap-2">
-            <Label>Medição atual</Label>
-            <span className="dark:bg-[#151526] border py-2 px-4 rounded-md bg-white">
-              {data.medidor.ultima_leitura}
-            </span>{" "}
-          </div>
-          <div className="flex flex-col gap-2">
-            <Label>Foto do relogio</Label>
-            <span className="dark:bg-[#151526] border py-2 px-4 rounded-md bg-white">
-              ????
-            </span>{" "}
-          </div>
-          {data.medidor.detalhes && (
             <div className="flex flex-col gap-2">
-              <Label>Detalhe do medidor</Label>
+              <Label>Leitura mês atual</Label>
+              <Input
+                disabled={edit}
+                value={leitura_atual}
+                className={`border-3 ${edit ? "border-transparent " : "border-gray-700 dark:border-gray-300 "}`}
+                placeholder={
+                  data.medidor.leituras.length === 0 ? "Sem leitura" : ""
+                }
+                onChange={(e) => setLeitura_atual(e.target.value)}
+                type="number"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <Label>Consumo</Label>
               <span className="dark:bg-[#151526] border py-2 px-4 rounded-md bg-white">
-                {data.medidor.detalhes}
+                {data.medidor.leituras.length === 0
+                  ? "Sem leitura"
+                  : data.medidor.leituras[0].consumo_mensal}
               </span>{" "}
             </div>
-          )}
+            <div className="flex flex-col gap-2">
+              <Label>Foto do relogio</Label>
+              <span className="dark:bg-[#151526] border py-2 px-4 rounded-md bg-white">
+                ????
+              </span>{" "}
+            </div>
+            {data.medidor.detalhes && (
+              <div className="flex flex-col gap-2">
+                <Label>Detalhe do medidor</Label>
+                <span className="dark:bg-[#151526] border py-2 px-4 rounded-md bg-white">
+                  {data.medidor.detalhes}
+                </span>{" "}
+              </div>
+            )}
+            <div className="flex flex-col gap-2">
+              <Label>Detalhe da leitura</Label>
+              <Textarea
+                disabled={edit}
+                value={detalheLeitura}
+                onChange={(e) => setDetalheLeitura(e.target.value)}
+                className={`border-3 ${edit ? "border-transparent " : "border-gray-700 dark:border-gray-300 "}`}
+              />
+            </div>
+            {!edit && (
+              <Button
+                type="submit"
+                variant={"default"}
+                disabled={edit}
+                className="w-full mt-4"
+              >
+                {isPending ? (
+                  <>
+                    Salvando
+                    <Loader2Icon className="animate-spin" />
+                  </>
+                ) : (
+                  "Salvar"
+                )}
+              </Button>
+            )}
+          </form>
         </section>
-        <section className="w-full mt-auto border">
+        <section className="w-full  border">
           <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
             <BarChart accessibilityLayer data={chartData}>
               <CartesianGrid vertical={false} />
@@ -202,15 +372,7 @@ export default function InfoLoja({ params }: DetalhesProps) {
                 axisLine={true}
               />
               <YAxis dataKey="consumo" />
-              <Tooltip
-                content={
-                  <CustomTooltip
-                    active={true}
-                    payload={undefined}
-                    label={undefined}
-                  />
-                }
-              />
+              <Tooltip content={<CustomTooltip />} />
               <Bar
                 dataKey="consumo"
                 fill="var(--color-consumo)"

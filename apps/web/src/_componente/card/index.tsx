@@ -18,9 +18,14 @@ import { useCreateLeitura, useFetchUser } from "@repo/utils";
 import { ButtonLoading } from "@/components/ui/buttonLoading";
 import Link from "next/link";
 
+const date = new Date();
+const currentDay = date.getDate();
+const currentMonth = date.getMonth() + 1;
+const currentYear = date.getFullYear();
+const currentDate = `${currentDay}/${currentMonth}/${currentYear}`;
+
 export function Card({ loja }: { loja: LojaComMedidores }) {
-  const { firstName, month, year, typeMedicao, localidade, searchQuery } =
-    useAppContext();
+  const { month, year, typeMedicao, localidade, searchQuery } = useAppContext();
   const { mutate, isPending } = useCreateLeitura(
     typeMedicao,
     month,
@@ -31,6 +36,7 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
 
   const { data } = useFetchUser();
   const user = data?.user;
+  const firstName = user?.nome_completo.split(" ")[0];
 
   const [isFormSheetOpen, setIsFormSheetOpen] = useState(false);
   const [isConfirmSheetOpen, setIsConfirmSheetOpen] = useState(false);
@@ -82,11 +88,9 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
       ano: year,
       leitura_anterior: medidor.ultima_leitura,
       leitura_atual: formData.medicao_atual,
-      consumo_mensal: formData.medicao_atual - medidor.ultima_leitura,
       foto_url: null,
-      lida_por_usuario_id: user.user_id,
       nome_usuario: `${firstName} - ${user.funcao}`,
-      detalhes_leitura: formData.detalhes_leitura,
+      detalhes_leitura: `Leitura feito por ${firstName} - ${user.funcao} / data: ${currentDate}, Detalhes a acrecentar: ${formData.detalhes_leitura || null}`,
     };
 
     mutate(new_leitura);
@@ -155,15 +159,25 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
         <span>{medidor.localidade}</span>
       </div>
       <div className="w-full flex justify-between">
-        <span>Medição atual</span>
-        <span>
-          {isMedidorVerified ? medidor.leituras[0]?.leitura_atual : "-- -- --"}
-        </span>
+        {isMedidorVerified ? (
+          <>
+            <span>Leitura atual</span>
+            <span>{medidor.leituras[0]?.leitura_atual}</span>
+          </>
+        ) : (
+          <>
+            <span>Leitura mês anterior </span>
+            <span> {medidor.ultima_leitura} </span>
+          </>
+        )}
       </div>
 
       <div className="w-full flex justify-between gap-6">
         <Button variant="outline" className="h-8 w-full">
-          <Link href={`/loja/${loja.id}/${loja.medidores[0].id}`}>
+          <Link
+            href={`/loja/${loja.id}/${loja.medidores[0].id}`}
+            className=" w-full h-full flex justify-center items-center"
+          >
             Detalhes
           </Link>
         </Button>
@@ -310,7 +324,7 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
                           O consumo foi alto nesse mês, coloque o motivo
                         </small>
                         <Textarea
-                          className={`text-gray-100 border ${formData.detalhes_leitura === "" && "border-red-500"}`}
+                          className={`text-gray-900 border ${formData.detalhes_leitura === "" && "border-red-500"}`}
                           placeholder="Digite o motivo"
                           required
                           value={formData.detalhes_leitura}

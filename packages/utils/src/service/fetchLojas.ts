@@ -10,28 +10,11 @@ export async function fetchLojas(
 ): Promise<LojaComMedidores[] | null> {
   const baseQuery = () => {
     let query = supabase.from("lojas").select(`
-      id,
-      nome_loja,
-      numero_loja,
-      ativa,
-      tem_energia,
-      tem_agua,
-      tem_gas,
-      complexo,
-      prefixo_loja,
+      *,
       medidores (
-        id,
-        tipo_medicao,
-        localidade,
-        numero_relogio,
-        ultima_leitura,
-        detalhes,
-        data_instalacao,
+       *,
         leituras (
-          leitura_atual,
-          consumo_mensal,
-          mes,
-          ano
+          *
         )
       )
     `);

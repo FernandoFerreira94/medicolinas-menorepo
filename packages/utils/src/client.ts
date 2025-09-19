@@ -1,5 +1,3 @@
-// packages/utils/src/supabase/client.ts
-
 import { createBrowserClient } from "@supabase/ssr";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
