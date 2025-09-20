@@ -13,6 +13,7 @@ export function ModeToggle() {
 
   return (
     <Button
+      className="hover:bg-transparent hover:scale-120 transition duration-500"
       variant="ghost"
       size="icon"
       // HERE: Check the current theme and set the opposite one

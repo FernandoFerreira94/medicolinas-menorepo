@@ -245,7 +245,7 @@ export default function EditUser({ params }: DetalhesProps) {
             <Button type="submit" disabled={isEdit} className="w-full mt-4">
               {isPending ? (
                 <>
-                  Editando <Loader2Icon className="animate-spin " />
+                  <Loader2Icon className="animate-spin " />
                 </>
               ) : (
                 " Editar usuario "
@@ -261,7 +261,7 @@ export default function EditUser({ params }: DetalhesProps) {
           >
             {isDeletePending ? (
               <>
-                Excluindo <Loader2Icon className="animate-spin" />
+                <Loader2Icon className="animate-spin" />
               </>
             ) : (
               "Excluir usuario"

@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { BsMenuButtonWideFill } from "react-icons/bs";
-import { MdStore } from "react-icons/md";
 import { FaUserAlt, FaUserCircle } from "react-icons/fa";
 import { FaFilePdf } from "react-icons/fa6";
 import { IoLogOut } from "react-icons/io5";
@@ -19,7 +18,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 
-import { useAppContext } from "../../app/context/useAppContext";
+import { useAppContext } from "../../context/useAppContext";
 import { Li } from "../../_componente/Li";
 import LogoI from "../../assets/IconsIwhite.png";
 import Logo from "../../assets/LogoWhite.png";
@@ -50,7 +49,7 @@ export function SideBar() {
   return (
     <nav
       className={`fixed top-0 rounded-tr-[16px] rounded-br-[16px]  flex flex-col items-center h-screen bg-[${roxoPrimary}] dark:bg-[${roxoDark}]  shadow-md transition-all duration-800 
-        ${showSideBar ? "w-42 " : "w-16 "}
+        ${showSideBar ? "w-60 " : "w-16 "}
           
       }`}
     >
@@ -74,7 +73,7 @@ export function SideBar() {
         )}
       </div>
 
-      <ul className=" flex flex-col h-full w-full items-center text-basic py-3 ">
+      <ul className=" flex flex-col h-full w-full  text-[17px] py-3 ">
         <Li title="Painel">
           <Link
             href="/medicao"
@@ -115,7 +114,7 @@ export function SideBar() {
                 />{" "}
                 {showSideBar && (
                   <div>
-                    <p>Cadastrar </p> <p>usuário</p>
+                    <p>Cadastrar usuário</p>
                   </div>
                 )}
               </Link>
@@ -181,8 +180,15 @@ export function SideBar() {
         )}
 
         <Li title="Perfil">
-          <FaUserCircle size={24} className="text-gray-100" />{" "}
-          {showSideBar && <span>Perfil</span>}
+          <Link
+            href="/profile"
+            className={`w-full h-full flex items-center  gap-2 ${
+              showSideBar ? "justify-start " : "justify-center"
+            }`}
+          >
+            <FaUserCircle size={24} className="text-gray-100" />{" "}
+            {showSideBar && <span>Perfil</span>}
+          </Link>
         </Li>
 
         <Li

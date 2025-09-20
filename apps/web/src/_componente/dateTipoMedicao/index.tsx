@@ -10,7 +10,7 @@ import {
 } from "../../../components/ui/select";
 import { MdSearch } from "react-icons/md";
 import { InputDate } from "@/components/ui/inputDate";
-import { useAppContext } from "@/src/app/context/useAppContext";
+import { useAppContext } from "@/src/context/useAppContext";
 import { useEffect } from "react"; // 👈 Importe useEffect
 import { Localidade } from "./localidade";
 

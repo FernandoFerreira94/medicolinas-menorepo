@@ -2,7 +2,7 @@
 
 "use client";
 import { MdOutlineToggleOff, MdToggleOn } from "react-icons/md";
-import { useAppContext } from "../../app/context/useAppContext";
+import { useAppContext } from "../../context/useAppContext";
 import { SideBar } from "../../_componente/sideBar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ModeToggle } from "@/components/ui/modeToggle";
@@ -27,7 +27,7 @@ export function Content({
       <SideBar />
       <div
         className={`h-full transition-all mr-4 duration-800 ${
-          showSideBar ? "ml-45" : "ml-20"
+          showSideBar ? "ml-62" : "ml-20"
         }`}
       >
         <div className="flex w-full mt-4 items-center">
@@ -67,7 +67,7 @@ export function Content({
             <ModeToggle />
           </div>
         </div>
-        <div className="mt-4 h-full pl-13 border-t mb-20">
+        <div className={`mt-4 h-full pl-13 border-t border-gray-300 mb-20`}>
           <section className="w-full flex mt-4 ">
             <Title text={title} />
           </section>

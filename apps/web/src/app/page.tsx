@@ -10,7 +10,7 @@ import Logo from "@/src/assets/Logo.png";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Label } from "../../components/ui/label";
-import { useAppContext } from "./context/useAppContext";
+import { useAppContext } from "../context/useAppContext";
 import Cookie from "js-cookie";
 import {
   Sheet,
@@ -197,7 +197,7 @@ export default function Login() {
           <Button type="submit">
             {isPending ? (
               <>
-                Acessando <Loader2Icon className="animate-spin" />
+                <Loader2Icon className="animate-spin" />
               </>
             ) : (
               "Acessar"

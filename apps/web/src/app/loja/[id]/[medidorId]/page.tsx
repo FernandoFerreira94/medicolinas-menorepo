@@ -35,7 +35,7 @@ import { CustomTooltip, chartConfig } from "./CustomTooltip";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 
-import { useAppContext } from "@/src/app/context/useAppContext";
+import { useAppContext } from "@/src/context/useAppContext";
 import { toast } from "sonner";
 
 export default function InfoLoja({ params }: DetalhesProps) {
@@ -93,7 +93,7 @@ export default function InfoLoja({ params }: DetalhesProps) {
       setTimeout(() => {
         (setLocalidade(data.medidor.localidade),
           setPrefixo(data.loja.prefixo_loja));
-      }, 0); // aplica depois
+      }, 0);
     }
   }, [data?.medidor.localidade]);
 
@@ -351,7 +351,6 @@ export default function InfoLoja({ params }: DetalhesProps) {
               >
                 {isPending ? (
                   <>
-                    Salvando
                     <Loader2Icon className="animate-spin" />
                   </>
                 ) : (

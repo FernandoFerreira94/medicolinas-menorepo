@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 
 import { Content } from "../../_componente/content";
 import { DateTipoMedicao } from "@/src/_componente/dateTipoMedicao";
-import { useAppContext } from "@/src/app/context/useAppContext";
+import { useAppContext } from "@/src/context/useAppContext";
 import { Card } from "@/src/_componente/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useFetchLojas, LojaComMedidores } from "@repo/utils";

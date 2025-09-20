@@ -12,7 +12,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useAppContext } from "@/src/app/context/useAppContext";
+import { useAppContext } from "@/src/context/useAppContext";
 import { toast } from "sonner";
 import { useCreateLeitura, useFetchUser } from "@repo/utils";
 import { ButtonLoading } from "@/components/ui/buttonLoading";

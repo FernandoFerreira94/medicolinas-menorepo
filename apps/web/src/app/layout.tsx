@@ -30,7 +30,7 @@ export default function RootLayout({
   return (
     <html lang="pt-br" suppressHydrationWarning>
       <body
-        className={`${roboto.variable} ${inter.variable} font-sans antialiased bg-gray-50 dark:bg-[#1F1F30]`}
+        className={`${roboto.variable} ${inter.variable} font-sans antialiased bg-gray-100 dark:bg-[#1F1F30]`}
       >
         <Providers>{children}</Providers>
       </body>

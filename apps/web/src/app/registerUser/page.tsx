@@ -197,10 +197,10 @@ export default function Register() {
         <Button type="submit" variant="default">
           {isPending ? (
             <>
-              Cadastrando <Loader2Icon className="animate-spin" />
+              <Loader2Icon className="animate-spin" />
             </>
           ) : (
-            "Cadastrar"
+            "Cadastrar usuario"
           )}
         </Button>
       </form>
