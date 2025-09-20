@@ -144,7 +144,7 @@ export default function InfoLoja({ params }: DetalhesProps) {
 
     const dataLoja = {
       nome_loja,
-      numero_loja,
+      numero_loja: Number(numero_loja),
       prefixo_loja: prefixo,
     };
 
@@ -232,7 +232,12 @@ export default function InfoLoja({ params }: DetalhesProps) {
             </div>
             <div className="flex flex-col gap-2">
               <Label>Prefixo loja</Label>
-              <Select required value={prefixo} onValueChange={setPrefixo}>
+              <Select
+                required
+                value={prefixo}
+                onValueChange={setPrefixo}
+                disabled={edit}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -249,6 +254,7 @@ export default function InfoLoja({ params }: DetalhesProps) {
               <Label>Numero loja</Label>
               <Input
                 disabled={edit}
+                type="number"
                 value={numero_loja}
                 onChange={(e) => setNumero_loja(e.target.value)}
                 className={`border-3 ${edit ? "border-transparent " : "border-gray-700 dark:border-gray-300 "}`}

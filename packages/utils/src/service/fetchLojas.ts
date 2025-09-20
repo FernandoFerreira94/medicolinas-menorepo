@@ -12,7 +12,7 @@ export async function fetchLojas(
     let query = supabase.from("lojas").select(`
       *,
       medidores (
-       *,
+        *,
         leituras (
           *
         )
@@ -39,10 +39,23 @@ export async function fetchLojas(
 
   if (searchQuery) {
     const formattedQuery = `%${searchQuery.toLowerCase()}%`;
+    const searchQueryNumber = Number(searchQuery);
+
+    const orClauses = [];
+
+    // Busca por nome e prefixo
+    orClauses.push(
+      `nome_loja.ilike.${formattedQuery},prefixo_loja.ilike.${formattedQuery}`
+    );
+
+    // Busca por numero_loja (se for um número válido)
+    if (!isNaN(searchQueryNumber)) {
+      orClauses.push(`numero_loja.eq.${searchQueryNumber}`);
+    }
 
     // Consulta 1: Busca em campos da loja (nome, prefixo, número)
     const { data: dataLojas, error: errorLojas } = await baseQuery().or(
-      `nome_loja.ilike.${formattedQuery},prefixo_loja.ilike.${formattedQuery},numero_loja.ilike.${formattedQuery}`
+      orClauses.join(",")
     );
 
     // Consulta 2: Busca por número de relógio

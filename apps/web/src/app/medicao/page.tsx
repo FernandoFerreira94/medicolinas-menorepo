@@ -6,7 +6,10 @@ import { DateTipoMedicao } from "@/src/_componente/dateTipoMedicao";
 import { useAppContext } from "@/src/context/useAppContext";
 import { Card } from "@/src/_componente/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button"; // Importe o componente Button do shadcn/ui
 import { useFetchLojas, LojaComMedidores } from "@repo/utils";
+
+const ITEMS_PER_PAGE = 60; // Define a quantidade inicial de itens a serem exibidos
 
 export default function Dashboard() {
   const { month, year, typeMedicao, localidade, searchQuery } = useAppContext();
@@ -24,6 +27,14 @@ export default function Dashboard() {
   const [vacantCount, setVacantCount] = useState(0);
   const [activeLeituras, setActiveLeituras] = useState(0);
   const [vacanLeitura, setVacanLeitura] = useState(0);
+
+  // NOVO: Estado para controlar a quantidade de lojas visíveis
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+
+  // NOVO: useEffect para resetar a contagem de visíveis quando os filtros mudam
+  useEffect(() => {
+    setVisibleCount(ITEMS_PER_PAGE);
+  }, [typeMedicao, month, year, localidade, searchQuery]);
 
   // useEffect 1: Filtra as lojas por data e tipo de medição
   useEffect(() => {
@@ -51,6 +62,7 @@ export default function Dashboard() {
     }
   }, [data, typeMedicao, month, year]);
 
+  // useEffect 2: Ordena, conta e atualiza os estados com base nas lojas filtradas
   useEffect(() => {
     if (filteredLojas.length > 0) {
       const tempLojas = [...filteredLojas];
@@ -76,13 +88,13 @@ export default function Dashboard() {
         const bHasReading = b.medidores[0]?.leituras.length > 0;
 
         if (aHasReading !== bHasReading) {
-          return aHasReading ? 1 : -1;
+          return aHasReading ? -1 : 1; // Ajustado para colocar as que têm leitura primeiro
         }
 
-        if (a.prefixo_loja > b.prefixo_loja) return -1;
-        if (a.prefixo_loja < b.prefixo_loja) return 1;
+        if (a.prefixo_loja > b.prefixo_loja) return 1;
+        if (a.prefixo_loja < b.prefixo_loja) return -1;
 
-        return parseInt(a.numero_loja) - parseInt(b.numero_loja);
+        return Number(a.numero_loja) - Number(b.numero_loja);
       });
 
       setSortedLojas(orderedLojas);
@@ -95,6 +107,11 @@ export default function Dashboard() {
       setVacantCount(0);
     }
   }, [filteredLojas]);
+
+  // Função para carregar mais lojas
+  const handleLoadMore = () => {
+    setVisibleCount((prevCount) => prevCount + ITEMS_PER_PAGE);
+  };
 
   return (
     <Content title="Painel medição">
@@ -109,7 +126,7 @@ export default function Dashboard() {
           Vagos ( {vacanLeitura} / {vacantCount} )
         </span>
       </div>
-      <section className="w-full flex flex-wrap  mt-4">
+      <section className="w-full flex flex-wrap mt-4">
         {isLoading ? (
           <>
             <Skeleton className="w-75 h-45 mr-8 mb-8 " />
@@ -121,13 +138,22 @@ export default function Dashboard() {
         ) : error ? (
           <p>Ocorreu um erro: {error.message}</p>
         ) : sortedLojas && sortedLojas.length > 0 ? (
-          sortedLojas.map((loja) => {
-            if (!loja.id) {
-              console.error("ID ausente ou inválido para uma loja:", loja);
-              return null;
-            }
-            return <Card key={loja.id} loja={loja} />;
-          })
+          <>
+            {sortedLojas.slice(0, visibleCount).map((loja) => {
+              if (!loja.id) {
+                console.error("ID ausente ou inválido para uma loja:", loja);
+                return null;
+              }
+              return <Card key={loja.id} loja={loja} />;
+            })}
+
+            {/* Renderiza o botão "Ver Mais" se houver mais lojas para mostrar */}
+            {visibleCount < sortedLojas.length && (
+              <div className="w-full flex justify-center mt-8 mb-8">
+                <Button onClick={handleLoadMore}>Ver Mais</Button>
+              </div>
+            )}
+          </>
         ) : (
           <p>Nenhuma loja encontrada.</p>
         )}

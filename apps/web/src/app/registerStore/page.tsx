@@ -21,7 +21,6 @@ import { useCreateLoja, capitalizeWords } from "@repo/utils";
 import { ButtonLoading } from "@/components/ui/buttonLoading";
 
 export default function RegisterStore() {
-  
   const formRef = useRef<HTMLFormElement>(null);
 
   const [complexo, setComplexo] = useState("Shopping Colinas");
@@ -53,7 +52,7 @@ export default function RegisterStore() {
   const { mutate, isPending } = useCreateLoja({
     onSuccess: () => {
       toast.success("Loja cadastrada com sucesso!");
-    
+
       resetForm();
     },
     onError: (error) => {
@@ -83,10 +82,7 @@ export default function RegisterStore() {
     const loja = {
       complexo: complexo,
       nome_loja: capitalizeWords({ str: nomeLoja }),
-      numero_loja: formData
-        .get("numero_loja")
-        ?.toString()
-        .toUpperCase() as string,
+      numero_loja: Number(formData.get("numero_loja")),
       ativa: ativa,
       tem_energia: energia,
       tem_agua: agua,
@@ -189,7 +185,7 @@ export default function RegisterStore() {
               </SelectContent>
             </Select>
             <Input
-              type="text"
+              type="number"
               placeholder="Numero da loja 01"
               id="numero_loja"
               required

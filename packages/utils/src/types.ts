@@ -33,7 +33,7 @@ export interface InputDateProps {
 // Tipos Relacionados a Lojas e Medidores
 export interface LojaProps {
   nome_loja: string;
-  numero_loja: string;
+  numero_loja: number;
   prefixo_loja: string;
   complexo: string;
   ativa: boolean;
@@ -107,7 +107,7 @@ export interface LojaComMedidores {
   prefixo_loja: string;
   complexo: string;
   nome_loja: string;
-  numero_loja: string;
+  numero_loja: number;
   ativa: boolean;
   tem_energia: boolean;
   tem_agua: boolean;
@@ -151,6 +151,6 @@ export interface EditMedidor {
 
 export interface EditLoja {
   nome_loja: string;
-  numero_loja: string;
+  numero_loja: number;
   prefixo_loja: string;
 }
