@@ -32,10 +32,13 @@ export function useCreateLeitura(
       if (options?.onSuccess) {
         options.onSuccess(data, variables, context);
       }
+      queryClient.invalidateQueries({
+        queryKey: ["medicoes", tipoMedicao, mes, ano, localidade, searchQuery],
+      });
 
       // Chama o toast DEPOIS de tudo
       toast.success(
-        `Leitura da loja ${data.loja.nome_loja} cadastrada com sucesso!`
+        `Leitura da loja ${data.nome_loja} cadastrada com sucesso!`
       );
     },
     onError: (error, variables, context) => {

@@ -50,8 +50,12 @@ export default function RegisterStore() {
   };
 
   const { mutate, isPending } = useCreateLoja({
-    onSuccess: () => {
-      toast.success("Loja cadastrada com sucesso!");
+    onSuccess: (data) => {
+      console.log(data);
+      console.log(data.lojaData[0].nome_loja);
+      toast.success(
+        `Loja ${data.lojaData[0]?.nome_loja} cadastrada com sucesso!`
+      );
 
       resetForm();
     },
@@ -65,6 +69,7 @@ export default function RegisterStore() {
 
     const formData = new FormData(event.currentTarget);
     const nomeLoja = formData.get("nome_loja") as string;
+    const quadro_distribuicao = formData.get("quadro_distribuicao") as string;
 
     if (energia && !localidade_energia) {
       toast.error("Selecione uma localidade para energia!");
@@ -82,12 +87,13 @@ export default function RegisterStore() {
     const loja = {
       complexo: complexo,
       nome_loja: capitalizeWords({ str: nomeLoja }),
-      numero_loja: Number(formData.get("numero_loja")),
+      numero_loja: formData.get("numero_loja") as string,
       ativa: ativa,
       tem_energia: energia,
       tem_agua: agua,
       tem_gas: gas,
       prefixo_loja: prefixo,
+      created_at: new Date("2025-06-01").toISOString(),
     };
 
     const medidores = [];
@@ -97,6 +103,8 @@ export default function RegisterStore() {
         tipo_medicao: "Energia",
         numero_relogio: formData.get("numero_relogio_energia") as string,
         localidade: localidade_energia,
+        quadro_distribuicao: formData.get("quadro_distribuicao") as string,
+        data_instalacao: new Date("2025-06-01").toISOString(),
         ultima_leitura: parseFloat(
           formData.get("ultima_leitura_energia") as string
         ),
@@ -108,6 +116,8 @@ export default function RegisterStore() {
         tipo_medicao: "Agua",
         numero_relogio: formData.get("numero_relogio_agua") as string,
         localidade: localidade_agua,
+        data_instalacao: new Date("2025-06-01").toISOString(),
+        quadro_distribuicao: null,
         ultima_leitura: parseFloat(
           formData.get("ultima_leitura_agua") as string
         ),
@@ -120,6 +130,8 @@ export default function RegisterStore() {
         tipo_medicao: "Gas",
         numero_relogio: formData.get("numero_relogio_gas") as string,
         localidade: localidade_gas,
+        data_instalacao: new Date("2025-06-01").toISOString(),
+        quadro_distribuicao: null,
         ultima_leitura: parseFloat(
           formData.get("ultima_leitura_gas") as string
         ),
@@ -169,6 +181,7 @@ export default function RegisterStore() {
               id="nome_loja"
               required
               name="nome_loja"
+              className="uppercase"
             />
 
             <Label>Nº loja</Label>
@@ -177,15 +190,28 @@ export default function RegisterStore() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="NT">NT</SelectItem>
-                <SelectItem value="NS">NS</SelectItem>
-                <SelectItem value="QT">QT</SelectItem>
-                <SelectItem value="QS">QS</SelectItem>
+                <SelectItem value="NS">NS - (Nivel Superior)</SelectItem>
+                <SelectItem value="NT">NT - (Nivel Terreo)</SelectItem>
+                <SelectItem value="QS">QS - (Quisque Superior)</SelectItem>
+                <SelectItem value="QT">QT - (Quisque Terreo)</SelectItem>
+                <SelectItem value="QBT">
+                  QBT - (Quisque Boulevard Terreo)
+                </SelectItem>
+                <SelectItem value="QVB">
+                  QVB - (Quisque Vitrine Boulevard )
+                </SelectItem>
+                <SelectItem value="AE">AE - (Area externa)</SelectItem>
+                <SelectItem value="AT">AT - (Area Tecnica)</SelectItem>
+                <SelectItem value="CE">CE </SelectItem>
+                <SelectItem value="D">D - (Deposito)</SelectItem>
+                <SelectItem value="EST">EST - (Estacionamento)</SelectItem>
+                <SelectItem value="TR">TR - (Torre Comercial)</SelectItem>
+                <SelectItem value="CAG">CAG ( Central Agua Gelada )</SelectItem>
                 <SelectItem value=" ">outros</SelectItem>
               </SelectContent>
             </Select>
             <Input
-              type="number"
+              type="text"
               placeholder="Numero da loja 01"
               id="numero_loja"
               required
@@ -221,6 +247,13 @@ export default function RegisterStore() {
                   <Localidade
                     value={localidade_energia}
                     setValue={setLocalidade_energia}
+                  />
+                  <Label>Quadro de distribuiçao</Label>
+                  <Input
+                    type="text"
+                    placeholder="Digite o quadro de distribuição"
+                    id="quadro_distribuicao"
+                    name="quadro_distribuicao"
                   />
                   <Label>Ultima leitura</Label>
                   <Input

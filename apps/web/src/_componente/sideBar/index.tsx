@@ -1,12 +1,13 @@
 import Image from "next/image";
 import { BsMenuButtonWideFill } from "react-icons/bs";
-import { FaUserAlt, FaUserCircle } from "react-icons/fa";
-import { FaFilePdf } from "react-icons/fa6";
+import { FaUserCircle } from "react-icons/fa";
+import { TbUserEdit } from "react-icons/tb";
+import { RiFileExcel2Fill } from "react-icons/ri";
 import { IoLogOut } from "react-icons/io5";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { MdAddBusiness } from "react-icons/md";
-import { TiUserAdd } from "react-icons/ti";
+import { TbUserPlus } from "react-icons/tb";
 import { useTheme } from "next-themes";
 import Cookies from "js-cookie";
 import {
@@ -77,7 +78,7 @@ export function SideBar() {
         <Li title="Painel">
           <Link
             href="/medicao"
-            className={`w-full h-full flex items-center  gap-2 ${
+            className={`w-full h-full flex items-center pl-1 gap-2 ${
               showSideBar ? "justify-start " : "justify-center"
             }`}
           >
@@ -91,7 +92,7 @@ export function SideBar() {
             <Li title="Cadastrar loja">
               <Link
                 href="/registerStore"
-                className={`w-full h-full flex items-center  gap-2 ${
+                className={`w-full h-full flex items-center pl-1  gap-2 ${
                   showSideBar ? "justify-start " : "justify-center"
                 }`}
               >
@@ -103,15 +104,11 @@ export function SideBar() {
             <Li title="Cadastrar usuário">
               <Link
                 href="/registerUser"
-                className={`w-full h-full flex items-center  gap-2 ${
+                className={`w-full h-full flex items-center   gap-2 ${
                   showSideBar ? "justify-start " : "justify-center"
                 }`}
               >
-                <TiUserAdd
-                  className={`text-gray-50 ${
-                    showSideBar ? "text-[30px]" : "text-3xl"
-                  }`}
-                />{" "}
+                <TbUserPlus size={32} className={`text-gray-50 `} />{" "}
                 {showSideBar && (
                   <div>
                     <p>Cadastrar usuário</p>
@@ -128,7 +125,7 @@ export function SideBar() {
                       showSideBar ? "justify-start " : "justify-center"
                     }`}
                   >
-                    <FaUserAlt size={24} className="text-gray-100" />{" "}
+                    <TbUserEdit size={32} className="text-gray-100" />{" "}
                     {showSideBar && <span>Editar usuário</span>}
                   </div>
                 </SheetTrigger>
@@ -165,14 +162,14 @@ export function SideBar() {
               </Sheet>
             </Li>
 
-            <Li title="Exportar PDF">
+            <Li title="Exportar Excel">
               <Link
-                href="/dashboard"
-                className={`w-full h-full flex items-center  gap-2 ${
+                href="/exportExcel"
+                className={`w-full h-full flex items-center pl-1 gap-2 ${
                   showSideBar ? "justify-start " : "justify-center"
                 }`}
               >
-                <FaFilePdf size={24} />
+                <RiFileExcel2Fill size={24} />
                 {showSideBar && <span>Exporta PDF</span>}
               </Link>
             </Li>
@@ -182,7 +179,7 @@ export function SideBar() {
         <Li title="Perfil">
           <Link
             href="/profile"
-            className={`w-full h-full flex items-center  gap-2 ${
+            className={`w-full h-full flex items-center  pl-1 gap-2 ${
               showSideBar ? "justify-start " : "justify-center"
             }`}
           >

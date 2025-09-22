@@ -84,13 +84,14 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
     }
     const new_leitura = {
       medidor_id: medidor.id,
-      mes: month,
+      mes: 6,
       ano: year,
       leitura_anterior: medidor.ultima_leitura,
       leitura_atual: formData.medicao_atual,
       foto_url: null,
       nome_usuario: `${firstName} - ${user.funcao}`,
       detalhes_leitura: `Leitura feito por ${firstName} - ${user.funcao} / data: ${currentDate}, Detalhes a acrecentar: ${formData.detalhes_leitura || null}`,
+      data_leitura: new Date("2025-06-01").toISOString(),
     };
 
     mutate(new_leitura);
@@ -104,6 +105,7 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
   };
 
   const medidor = loja.medidores[0];
+
   const verifiedMedidor = () => {
     if (medidor.leituras[0]?.leitura_atual) {
       return true;
@@ -133,14 +135,37 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
   // CORREÇÃO: A lógica para desabilitar o botão
   const shouldDisableButton = medidorJaLidoNoMes || 26 < 25;
 
+  const formatarLeitura = (valor: number) => {
+    // separa sempre os dois últimos dígitos como casas decimais
+    const inteiro = Math.floor(valor / 100);
+    const decimais = valor % 100;
+
+    const ajustado = inteiro + decimais / 100;
+
+    return ajustado.toLocaleString("pt-BR", {
+      style: "decimal",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
+  };
+
+  // Função para limitar o texto
+  const truncateText = (text: string, maxLength: number) => {
+    if (text.length > maxLength) {
+      return text.substring(0, maxLength) + "...";
+    }
+    return text;
+  };
   return (
     <div
-      className={`border-l-8  ${isMedidorVerified ? "border-green-500" : "border-red-500"} flex flex-col w-75 h-45 gap-1 justify-between py-2 px-4 rounded-xl text-gray-900 dark:text-gray-50 mr-8 mb-8
+      className={`border-l-8  ${isMedidorVerified ? "border-green-500" : "border-red-500"} flex flex-col w-110  gap-2 justify-between py-4 px-4 rounded-xl text-gray-900 dark:text-gray-50 mr-8 mb-8
       bg-white dark:bg-[#151526] hover:shadow-[2px_2px_10px_4px_#A7B3C3,-2px_-2px_10px_#FFFFFF] transition-shadow duration-300 shadow-xl`}
       key={loja.id}
     >
       <div className="w-full flex justify-between">
-        <span className="text-lg font-semibold">{loja.nome_loja}</span>
+        <span title={loja.nome_loja} className="text-lg font-semibold">
+          {truncateText(loja.nome_loja, 15)}
+        </span>
         <div className="flex gap-2">
           <span className="text-lg font-semibold">
             {loja.prefixo_loja} - {loja.numero_loja}
@@ -159,17 +184,16 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
         <span>{medidor.localidade}</span>
       </div>
       <div className="w-full flex justify-between">
-        {isMedidorVerified ? (
-          <>
-            <span>Leitura atual</span>
-            <span>{medidor.leituras[0]?.leitura_atual}</span>
-          </>
-        ) : (
-          <>
-            <span>Leitura mês anterior </span>
-            <span> {medidor.ultima_leitura} </span>
-          </>
-        )}
+        <span>Leitura mês anterior </span>
+        <span> {medidor.ultima_leitura} </span>
+      </div>
+      <div className="w-full flex justify-between">
+        <span>Leitura atual</span>
+        <span>{medidor.leituras[0]?.leitura_atual || "--- ---"}</span>
+      </div>
+      <div className="w-full flex justify-between">
+        <span>Consumo</span>
+        <span>{medidor.leituras[0]?.consumo_mensal || "--- ---"}</span>
       </div>
 
       <div className="w-full flex justify-between gap-6">

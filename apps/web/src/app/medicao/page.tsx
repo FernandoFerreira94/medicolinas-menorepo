@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button"; // Importe o componente Button do shadcn/ui
 import { useFetchLojas, LojaComMedidores } from "@repo/utils";
 
-const ITEMS_PER_PAGE = 60; // Define a quantidade inicial de itens a serem exibidos
+const ITEMS_PER_PAGE = 40; // Define a quantidade inicial de itens a serem exibidos
 
 export default function Dashboard() {
   const { month, year, typeMedicao, localidade, searchQuery } = useAppContext();
@@ -88,7 +88,7 @@ export default function Dashboard() {
         const bHasReading = b.medidores[0]?.leituras.length > 0;
 
         if (aHasReading !== bHasReading) {
-          return aHasReading ? -1 : 1; // Ajustado para colocar as que têm leitura primeiro
+          return aHasReading ? 1 : -1;
         }
 
         if (a.prefixo_loja > b.prefixo_loja) return 1;
@@ -147,10 +147,15 @@ export default function Dashboard() {
               return <Card key={loja.id} loja={loja} />;
             })}
 
-            {/* Renderiza o botão "Ver Mais" se houver mais lojas para mostrar */}
             {visibleCount < sortedLojas.length && (
               <div className="w-full flex justify-center mt-8 mb-8">
-                <Button onClick={handleLoadMore}>Ver Mais</Button>
+                <Button
+                  onClick={handleLoadMore}
+                  variant={"ghost"}
+                  className="w-1/5"
+                >
+                  Ver Mais
+                </Button>
               </div>
             )}
           </>

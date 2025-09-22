@@ -9,14 +9,17 @@ export async function CreateLojaService({ loja, medidores }: CreateLojaData) {
     const { data: existingLoja, error: fetchError } = await supabase
       .from("lojas")
       .select("id")
-      .or(`nome_loja.eq.${loja.nome_loja}, numero_loja.eq.${loja.numero_loja}`);
+      .eq("prefixo_loja", loja.prefixo_loja)
+      .eq("numero_loja", loja.numero_loja);
 
     if (fetchError) {
       throw new Error("Erro na verificação de loja: " + fetchError.message);
     }
 
     if (existingLoja && existingLoja.length > 0) {
-      throw new Error("Esta loja já existe no banco de dados.");
+      throw new Error(
+        `Já existe uma loja com o prefixo "${loja.prefixo_loja}" e número "${loja.numero_loja}".`
+      );
     }
 
     // 2. Insira a nova loja
@@ -31,9 +34,31 @@ export async function CreateLojaService({ loja, medidores }: CreateLojaData) {
 
     const loja_id = lojaData[0].id;
 
-    // 3. Vincula o ID da loja aos medidores e os insere
-    let medidorData = null;
+    // 3. Verifique duplicidade de medidores antes de inserir
     if (medidores.length > 0) {
+      for (const medidor of medidores) {
+        const { data: existingMedidor, error: medidorCheckError } =
+          await supabase
+            .from("medidores")
+            .select("id")
+            .eq("numero_relogio", medidor.numero_relogio)
+            .eq("tipo_medicao", medidor.tipo_medicao)
+            .eq("loja_id", loja_id);
+
+        if (medidorCheckError) {
+          throw new Error(
+            "Erro na verificação de medidor: " + medidorCheckError.message
+          );
+        }
+
+        if (existingMedidor && existingMedidor.length > 0) {
+          throw new Error(
+            `Já existe um medidor com o número de relógio "${medidor.numero_relogio}" e tipo "${medidor.tipo_medicao}" para esta loja.`
+          );
+        }
+      }
+
+      // 4. Insere os medidores se não houver duplicatas
       const { data: insertedMedidoresData, error: medidorError } =
         await supabase
           .from("medidores")
@@ -45,13 +70,13 @@ export async function CreateLojaService({ loja, medidores }: CreateLojaData) {
           "Erro ao inserir os medidores: " + medidorError.message
         );
       }
-      medidorData = insertedMedidoresData;
+
+      return { lojaData, medidorData: insertedMedidoresData };
     }
 
-    return { lojaData, medidorData };
+    return { lojaData, medidorData: null };
   } catch (error) {
     console.error("Erro no serviço de criação da loja:", error);
-
     throw error;
   }
 }

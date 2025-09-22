@@ -42,21 +42,38 @@ export function Localidade({
         <SelectItem value="Shaft-NS" className="flex items-center gap-2">
           Shaft - NS
         </SelectItem>
-        <SelectItem value="piso26" className="flex items-center gap-2">
+        <SelectItem value="Area tecnica 26" className="flex items-center gap-2">
           Area tecnica 26
         </SelectItem>
-        <SelectItem value="piso27" className="flex items-center gap-2">
+        <SelectItem value="Area tecnica 27" className="flex items-center gap-2">
           Area tecnica 27
-        </SelectItem>
-        <SelectItem value="Sub-Doca" className="flex items-center gap-2">
-          Sub-Doca
-        </SelectItem>
-        <SelectItem value="Hotel" className="flex items-center gap-2">
-          Hotel
         </SelectItem>
         <SelectItem value="Sub-Band" className="flex items-center gap-2">
           Sub-Band
         </SelectItem>
+        <SelectItem value="CAG" className="flex items-center gap-2">
+          CAG
+        </SelectItem>
+        <SelectItem value="Sub-Doca-Hotel" className="flex items-center gap-2">
+          Sub-Doca-Hotel
+        </SelectItem>
+        <SelectItem value="Sub-Eco-Primo" className="flex items-center gap-2">
+          Sub-Eco-Primo
+        </SelectItem>
+        <SelectItem value="Sub-Principal" className="flex items-center gap-2">
+          Sub-Principal
+        </SelectItem>
+        <SelectItem value="Hotel" className="flex items-center gap-2">
+          Hotel
+        </SelectItem>
+        <SelectItem value="Casa-Bomba" className="flex items-center gap-2">
+          Casa-Bomba
+        </SelectItem>
+
+        <SelectItem value="Torre-Comercial" className="flex items-center gap-2">
+          Torre-Comercial
+        </SelectItem>
+
         <SelectItem value="Outros" className="flex items-center gap-2">
           Outros
         </SelectItem>
