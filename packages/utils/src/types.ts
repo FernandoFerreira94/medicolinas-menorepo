@@ -65,8 +65,9 @@ export interface LeituraProps {
   consumo_mensal: number;
   mes: number;
   ano: number;
-
+  leitura_anterior: number;
   created_at: string;
+  consumo_anterior: number;
 }
 
 export interface Medidor {

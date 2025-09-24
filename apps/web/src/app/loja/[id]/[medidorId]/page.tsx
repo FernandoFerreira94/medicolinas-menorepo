@@ -8,6 +8,7 @@ import {
   Tooltip,
   LabelList,
 } from "recharts";
+import { useRouter } from "next/navigation";
 import { Loader2Icon } from "lucide-react";
 import { ChartContainer } from "@/components/ui/chart";
 import React, { useState, useEffect } from "react";
@@ -40,26 +41,29 @@ import { toast } from "sonner";
 
 export default function InfoLoja({ params }: DetalhesProps) {
   const resolvedParams = React.use(params);
+  const router = useRouter();
   const { id, medidorId } = resolvedParams;
   const { month, year } = useAppContext();
   const [edit, setEdit] = useState(true);
   const [numero_relogio, setNumero_relogio] = useState("");
   const [quadroDistribuicao, setQuadroDistribuicao] = useState("");
   const [localidade, setLocalidade] = useState("");
-  const [leitura_atual, setLeitura_atual] = useState<string>("");
+  const [leitura_atual, setLeitura_atual] = useState("");
   const [detalheLeitura, setDetalheLeitura] = useState("");
   const [ativa, setAtiva] = useState(false);
   const [nome_loja, setNome_loja] = useState("");
   const [numero_loja, setNumero_loja] = useState("");
-  const [prefixo, setPrefixo] = useState("");
+  const [detalheMedidor, setDetalheMedidor] = useState("");
 
   const { data, isLoading, error } = useFetchLojaSingle(id, medidorId);
-  console.log(data);
+  const [prefixo, setPrefixo] = useState(data?.loja?.prefixo_loja || "");
+
   const { mutate, isPending } = useEditLeituraMedidor({
     onSuccess: () => {
       toast.success(
         `Loja ${data?.loja?.nome_loja} - ${data?.loja?.prefixo_loja}-${data?.loja?.numero_loja} editada com sucesso!`
       );
+      router.push("/medicao");
     },
     onError: (error) => {
       toast.error(error.message);
@@ -73,13 +77,14 @@ export default function InfoLoja({ params }: DetalhesProps) {
     if (data) {
       setNumero_relogio(data.medidor.numero_relogio);
       setLeitura_atual(
-        data.medidor.leituras[0]?.leitura_atual || "Sem leitura"
+        data.medidor.leituras[0]?.leitura_atual || data.medidor.ultima_leitura
       );
       setDetalheLeitura(
-        data.medidor.leituras[0]?.detalhes_leitura || "Nenhum detalhe"
+        data.medidor.leituras[0]?.detalhes_leitura || "Sem detalhe"
       );
       setAtiva(data.loja.ativa);
       setQuadroDistribuicao(data?.medidor?.quadro_distribuicao || "");
+      setDetalheMedidor(data?.medidor?.detalhes || "Sem detalhes");
     }
     setNome_loja(data?.loja?.nome_loja || "");
     setNumero_loja(data?.loja?.numero_loja || "");
@@ -91,11 +96,12 @@ export default function InfoLoja({ params }: DetalhesProps) {
       setLocalidade("");
       setPrefixo("");
       setTimeout(() => {
-        (setLocalidade(data.medidor.localidade),
-          setPrefixo(data.loja.prefixo_loja));
-      }, 0);
+        setLocalidade(data.medidor.localidade);
+
+        setPrefixo(data.loja.prefixo_loja);
+      }, 500);
     }
-  }, [data?.medidor.localidade]);
+  }, [data?.medidor.localidade, data?.loja.prefixo_loja]);
 
   if (!data) {
     return (
@@ -140,20 +146,23 @@ export default function InfoLoja({ params }: DetalhesProps) {
       localidade,
       quadro_distribuicao: quadroDistribuicao,
       ultima_leitura: Number(leitura_atual),
+      detalhes: detalheMedidor,
     };
 
     const dataLoja = {
       nome_loja,
-      numero_loja: Number(numero_loja),
+      numero_loja: numero_loja,
       prefixo_loja: prefixo,
+      ativa,
     };
-
+    console.log(dataMedidor);
     // ✅ CORREÇÃO: Use a lógica de if/else para chamar a mutação
     if (data?.medidor.leituras.length > 0) {
       const dataLeitura = {
         leitura_atual: Number(leitura_atual),
         detalhes_leitura: detalheLeitura,
       };
+
       mutate({
         medidor_id: data?.medidor?.id,
         loja_id,
@@ -242,10 +251,25 @@ export default function InfoLoja({ params }: DetalhesProps) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="NT">NT</SelectItem>
-                  <SelectItem value="NS">NS</SelectItem>
-                  <SelectItem value="QT">QT</SelectItem>
-                  <SelectItem value="QS">QS</SelectItem>
+                  <SelectItem value="NS">NS - (Nivel Superior)</SelectItem>
+                  <SelectItem value="NT">NT - (Nivel Terreo)</SelectItem>
+                  <SelectItem value="QS">QS - (Quisque Superior)</SelectItem>
+                  <SelectItem value="QT">QT - (Quisque Terreo)</SelectItem>
+                  <SelectItem value="QBT">
+                    QBT - (Quisque Boulevard Terreo)
+                  </SelectItem>
+                  <SelectItem value="QVB">
+                    QVB - (Quisque Vitrine Boulevard )
+                  </SelectItem>
+                  <SelectItem value="AE">AE - (Area externa)</SelectItem>
+                  <SelectItem value="AT">AT - (Area Tecnica)</SelectItem>
+                  <SelectItem value="CE">CE </SelectItem>
+                  <SelectItem value="D">D - (Deposito)</SelectItem>
+                  <SelectItem value="EST">EST - (Estacionamento)</SelectItem>
+                  <SelectItem value="TR">TR - (Torre Comercial)</SelectItem>
+                  <SelectItem value="CAG">
+                    CAG ( Central Agua Gelada )
+                  </SelectItem>
                   <SelectItem value=" ">outros</SelectItem>
                 </SelectContent>
               </Select>
@@ -299,19 +323,19 @@ export default function InfoLoja({ params }: DetalhesProps) {
             <div className="flex flex-col gap-2">
               <Label>Leitura mês anterior</Label>
               <span className="dark:bg-[#151526] border py-2 px-4 rounded-md bg-white">
-                {data.medidor.leituras.length === 0
-                  ? data.medidor.ultima_leitura
-                  : data.medidor.leituras[0].leitura_anterior}
+                {data.medidor?.leituras[0]?.leitura_anterior
+                  ? data.medidor?.leituras[0]?.leitura_anterior
+                  : data.medidor.ultima_leitura}
               </span>{" "}
             </div>
             <div className="flex flex-col gap-2">
               <Label>Leitura mês atual</Label>
               <Input
                 disabled={edit}
-                value={leitura_atual}
+                value={data.medidor.leituras.leitura_atual}
                 className={`border-3 ${edit ? "border-transparent " : "border-gray-700 dark:border-gray-300 "}`}
                 placeholder={
-                  data.medidor.leituras.length === 0 ? "Sem leitura" : ""
+                  data.medidor.leituras.leitura_atual || "Sem leitura"
                 }
                 onChange={(e) => setLeitura_atual(e.target.value)}
                 type="number"
@@ -331,14 +355,17 @@ export default function InfoLoja({ params }: DetalhesProps) {
                 ????
               </span>{" "}
             </div>
-            {data.medidor.detalhes && (
-              <div className="flex flex-col gap-2">
-                <Label>Detalhe do medidor</Label>
-                <span className="dark:bg-[#151526] border py-2 px-4 rounded-md bg-white">
-                  {data.medidor.detalhes}
-                </span>{" "}
-              </div>
-            )}
+
+            <div className="flex flex-col gap-2">
+              <Label>Detalhe do medidor</Label>
+              <Textarea
+                disabled={edit}
+                value={detalheMedidor}
+                onChange={(e) => setDetalheMedidor(e.target.value)}
+                className={`border-3 ${edit ? "border-transparent " : "border-gray-700 dark:border-gray-300 "}`}
+              />
+            </div>
+
             <div className="flex flex-col gap-2">
               <Label>Detalhe da leitura</Label>
               <Textarea

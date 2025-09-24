@@ -89,6 +89,7 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
       leitura_anterior: medidor.ultima_leitura,
       leitura_atual: formData.medicao_atual,
       foto_url: null,
+      consumo_mensal: formData.medicao_atual - medidor.ultima_leitura,
       nome_usuario: `${firstName} - ${user.funcao}`,
       detalhes_leitura: `Leitura feito por ${firstName} - ${user.funcao} / data: ${currentDate}, Detalhes a acrecentar: ${formData.detalhes_leitura || null}`,
       data_leitura: new Date("2025-06-01").toISOString(),
@@ -164,7 +165,7 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
     >
       <div className="w-full flex justify-between">
         <span title={loja.nome_loja} className="text-lg font-semibold">
-          {truncateText(loja.nome_loja, 15)}
+          {truncateText(loja.nome_loja, 25)}
         </span>
         <div className="flex gap-2">
           <span className="text-lg font-semibold">
@@ -185,7 +186,12 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
       </div>
       <div className="w-full flex justify-between">
         <span>Leitura mês anterior </span>
-        <span> {medidor.ultima_leitura} </span>
+        <span>
+          {" "}
+          {medidor.leituras[0]?.leitura_anterior
+            ? medidor.leituras[0]?.leitura_anterior
+            : medidor.ultima_leitura}
+        </span>
       </div>
       <div className="w-full flex justify-between">
         <span>Leitura atual</span>

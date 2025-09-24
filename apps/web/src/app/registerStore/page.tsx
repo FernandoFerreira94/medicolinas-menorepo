@@ -69,7 +69,6 @@ export default function RegisterStore() {
 
     const formData = new FormData(event.currentTarget);
     const nomeLoja = formData.get("nome_loja") as string;
-    const quadro_distribuicao = formData.get("quadro_distribuicao") as string;
 
     if (energia && !localidade_energia) {
       toast.error("Selecione uma localidade para energia!");
