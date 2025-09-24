@@ -45,11 +45,9 @@ export default function Login() {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    // const formData = new FormData(event.currentTarget);
-    //const matricula = formData.get("matricula") as string;
-    //const password = formData.get("password") as string;
-    const matricula = "155157";
-    const password = "454184";
+    const formData = new FormData(event.currentTarget);
+    const matricula = formData.get("matricula") as string;
+    const password = formData.get("password") as string;
 
     if (!matricula || !password) {
       toast.warning("Por favor, preencha todos os campos.");

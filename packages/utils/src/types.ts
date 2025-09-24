@@ -91,6 +91,7 @@ export interface CreateLeituraProps {
   foto_url: string | null;
   nome_usuario: string;
   detalhes_leitura: string | null;
+  nome_loja_leitura: string;
 }
 
 export interface MedidorComLeitura {

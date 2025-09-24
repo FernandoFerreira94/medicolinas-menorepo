@@ -44,7 +44,7 @@ export default function Register() {
 
   const { mutate, isPending } = useSignUp({
     onSuccess: (data) => {
-      toast.success(`Usuario: ${data.nome_completo} cadastrado com sucesso!`);
+      toast(`Usuario: ${data.nome_completo} cadastrado com sucesso!`);
       queryClient.invalidateQueries({ queryKey: queryKeys.allUsers() });
       resetFormFields();
     },

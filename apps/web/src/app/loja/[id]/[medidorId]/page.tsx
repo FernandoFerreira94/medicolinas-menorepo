@@ -60,7 +60,7 @@ export default function InfoLoja({ params }: DetalhesProps) {
 
   const { mutate, isPending } = useEditLeituraMedidor({
     onSuccess: () => {
-      toast.success(
+      toast(
         `Loja ${data?.loja?.nome_loja} - ${data?.loja?.prefixo_loja}-${data?.loja?.numero_loja} editada com sucesso!`
       );
       router.push("/medicao");
@@ -155,7 +155,7 @@ export default function InfoLoja({ params }: DetalhesProps) {
       prefixo_loja: prefixo,
       ativa,
     };
-    console.log(dataMedidor);
+
     // ✅ CORREÇÃO: Use a lógica de if/else para chamar a mutação
     if (data?.medidor.leituras.length > 0) {
       const dataLeitura = {
@@ -181,7 +181,7 @@ export default function InfoLoja({ params }: DetalhesProps) {
       });
     }
   }
-  console.log(data);
+
   return (
     <Content
       title={`${data.loja.nome_loja} - ${data.loja.prefixo_loja} ${data.loja.numero_loja} - Mês referente ${month}/${year}`}
@@ -278,7 +278,7 @@ export default function InfoLoja({ params }: DetalhesProps) {
               <Label>Numero loja</Label>
               <Input
                 disabled={edit}
-                type="number"
+                type="text"
                 value={numero_loja}
                 onChange={(e) => setNumero_loja(e.target.value)}
                 className={`border-3 ${edit ? "border-transparent " : "border-gray-700 dark:border-gray-300 "}`}
@@ -332,10 +332,10 @@ export default function InfoLoja({ params }: DetalhesProps) {
               <Label>Leitura mês atual</Label>
               <Input
                 disabled={edit}
-                value={data.medidor.leituras.leitura_atual}
+                value={data?.medidor?.leituras[0]?.leitura_atual || ""}
                 className={`border-3 ${edit ? "border-transparent " : "border-gray-700 dark:border-gray-300 "}`}
                 placeholder={
-                  data.medidor.leituras.leitura_atual || "Sem leitura"
+                  data?.medidor?.leituras[0]?.leitura_atual || "Sem leitura"
                 }
                 onChange={(e) => setLeitura_atual(e.target.value)}
                 type="number"

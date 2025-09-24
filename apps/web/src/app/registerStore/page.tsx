@@ -51,11 +51,8 @@ export default function RegisterStore() {
 
   const { mutate, isPending } = useCreateLoja({
     onSuccess: (data) => {
-      console.log(data);
-      console.log(data.lojaData[0].nome_loja);
-      toast.success(
-        `Loja ${data.lojaData[0]?.nome_loja} cadastrada com sucesso!`
-      );
+
+      toast(`Loja ${data.lojaData[0]?.nome_loja} cadastrada com sucesso!`);
 
       resetForm();
     },

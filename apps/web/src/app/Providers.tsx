@@ -21,7 +21,16 @@ export function Providers({ children }: { children: React.ReactNode }) {
           disableTransitionOnChange
         >
           {children}
-          <Toaster richColors />
+          <Toaster
+            richColors
+            position="top-center"
+            // ✅ Mantenha apenas o estilo geral aqui
+            toastOptions={{
+              unstyled: true,
+              className:
+                "flex items-center justify-center gap-8 p-4 rounded-xl shadow-lg border-3 border-green-600 text-gray-100 bg-gray-900 dark:bg-[#151526] dark:border-green-600 dark:text-gray-100",
+            }}
+          />
         </ThemeProvider>
       </AppProvider>
       {/* Devtools para depuração */}

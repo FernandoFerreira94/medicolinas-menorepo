@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/sheet";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { useAppContext } from "@/src/context/useAppContext";
 import { toast } from "sonner";
 import { useCreateLeitura, useFetchUser } from "@repo/utils";
@@ -78,10 +77,6 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
   };
 
   const handleFinalSubmit = () => {
-    if (verif && formData.detalhes_leitura === "") {
-      toast.warning("Se nao souber, coloque não sei e informe o coordenador.");
-      return;
-    }
     const new_leitura = {
       medidor_id: medidor.id,
       mes: 6,
@@ -93,6 +88,7 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
       nome_usuario: `${firstName} - ${user.funcao}`,
       detalhes_leitura: `Leitura feito por ${firstName} - ${user.funcao} / data: ${currentDate}, Detalhes a acrecentar: ${formData.detalhes_leitura || null}`,
       data_leitura: new Date("2025-06-01").toISOString(),
+      nome_loja_leitura: loja.nome_loja,
     };
 
     mutate(new_leitura);
@@ -115,57 +111,29 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
   };
   const isMedidorVerified = verifiedMedidor();
 
-  const verifiGasto = () => {
-    // Define um limite de consumo mensal aceitável
-    const limiteConsumoAlto = 800; // Altere este valor conforme a necessidade
-
-    // Calcula o consumo mensal
-    const consumoMensal = formData.medicao_atual - medidor.ultima_leitura;
-
-    // Retorna true se o consumo for maior que o limite, caso contrário, retorna false
-    return consumoMensal > limiteConsumoAlto;
-  };
-
-  const verif = verifiGasto();
-
   // CORREÇÃO: Nova lógica para verificar se a leitura já foi feita no mês
   const medidorJaLidoNoMes = medidor.leituras.some(
     (leitura) => leitura.mes === month && leitura.ano === year
   );
 
-  // CORREÇÃO: A lógica para desabilitar o botão
   const shouldDisableButton = medidorJaLidoNoMes || 26 < 25;
-
-  const formatarLeitura = (valor: number) => {
-    // separa sempre os dois últimos dígitos como casas decimais
-    const inteiro = Math.floor(valor / 100);
-    const decimais = valor % 100;
-
-    const ajustado = inteiro + decimais / 100;
-
-    return ajustado.toLocaleString("pt-BR", {
-      style: "decimal",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-  };
 
   // Função para limitar o texto
   const truncateText = (text: string, maxLength: number) => {
     if (text.length > maxLength) {
-      return text.substring(0, maxLength) + "...";
+      return text.substring(0, maxLength).toUpperCase() + "...";
     }
-    return text;
+    return text.toUpperCase(); // ✅ Ajuste aqui: Converte o texto para maiúsculas mesmo se não for truncado.
   };
   return (
     <div
-      className={`border-l-8  ${isMedidorVerified ? "border-green-500" : "border-red-500"} flex flex-col w-110  gap-2 justify-between py-4 px-4 rounded-xl text-gray-900 dark:text-gray-50 mr-8 mb-8
+      className={`border-l-8  ${isMedidorVerified ? "border-green-500" : "border-red-500"} flex flex-col w-100  gap-2 justify-between py-4 px-4 rounded-xl text-gray-900 dark:text-gray-50 mr-8 mb-8
       bg-white dark:bg-[#151526] hover:shadow-[2px_2px_10px_4px_#A7B3C3,-2px_-2px_10px_#FFFFFF] transition-shadow duration-300 shadow-xl`}
       key={loja.id}
     >
       <div className="w-full flex justify-between">
         <span title={loja.nome_loja} className="text-lg font-semibold">
-          {truncateText(loja.nome_loja, 25)}
+          {truncateText(loja.nome_loja, 17)}
         </span>
         <div className="flex gap-2">
           <span className="text-lg font-semibold">
@@ -199,7 +167,7 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
       </div>
       <div className="w-full flex justify-between">
         <span>Consumo</span>
-        <span>{medidor.leituras[0]?.consumo_mensal || "--- ---"}</span>
+        <span>{medidor.leituras[0]?.consumo_mensal}</span>
       </div>
 
       <div className="w-full flex justify-between gap-6">
@@ -296,13 +264,15 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
                     />
                   </div>
 
-                  <Button
-                    onClick={handleNextStep}
-                    className="w-full  mt-auto"
-                    variant={"outline"}
-                  >
-                    Registrar medição
-                  </Button>
+                  {formData.medicao_atual >= medidor.ultima_leitura && (
+                    <Button
+                      onClick={handleNextStep}
+                      className="w-full  mt-auto"
+                      variant={"outline"}
+                    >
+                      Registrar medição
+                    </Button>
+                  )}
                 </div>
               </SheetDescription>
             </SheetHeader>
@@ -326,7 +296,7 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
               </SheetTitle>
               {/* CORREÇÃO AQUI: Adicionado 'asChild' para permitir a <div> */}
               <SheetDescription asChild className="text-gray-50">
-                <div className="flex flex-col gap-4 mt-8">
+                <div className="flex flex-col gap-4 mt-8 h-full">
                   <div className="flex flex-col gap-2">
                     <span className="font-semibold text-lg">
                       Medição mês anterior
@@ -344,38 +314,23 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
                   <div className="flex flex-col gap-2">
                     <span className="font-semibold text-lg">Gasto no mês</span>
                     <Label
-                      className={`bg-gray-900 rounded-lg p-2 dark:bg-gray-600 border-1  ${verif ? "border-red-500" : "border-green-500"} `}
+                      className={`bg-gray-900 rounded-lg p-2 dark:bg-gray-600 border-2  border-slate-200 `}
                     >
                       {formData.medicao_atual - medidor.ultima_leitura}
                     </Label>
-                    {verif && (
-                      <>
-                        <small className="text-[14px] text-red-500 ">
-                          O consumo foi alto nesse mês, coloque o motivo
-                        </small>
-                        <Textarea
-                          className={`text-gray-900 border ${formData.detalhes_leitura === "" && "border-red-500"}`}
-                          placeholder="Digite o motivo"
-                          required
-                          value={formData.detalhes_leitura}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              detalhes_leitura: e.target.value,
-                            })
-                          }
-                        />
-                      </>
-                    )}
                   </div>
                   <div className="mt-4">
                     Se sim, clique em **Registrar** para salvar os dados.
                   </div>
-                  <div className="text-gray-50 flex-col flex gap-4 mt-8">
+                  <div
+                    className="text-gray-50 flex-col flex h-full gap-4 mt-
+                  auto"
+                  >
                     {isPending ? (
                       <ButtonLoading />
                     ) : (
                       <Button
+                        className="w-full mt-auto"
                         onClick={handleFinalSubmit}
                         variant={"outline"}
                         disabled={isPending}

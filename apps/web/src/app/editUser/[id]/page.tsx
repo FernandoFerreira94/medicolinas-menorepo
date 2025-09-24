@@ -53,10 +53,10 @@ export default function EditUser({ params }: DetalhesProps) {
     onSuccess: () => {
       setIsEdit(true);
       queryClient.invalidateQueries({ queryKey: queryKeys.allUsers() });
-      toast.success("Usuário editado com sucesso!");
+      toast("Usuário editado com sucesso!");
     },
     onError: (error) => {
-      console.log(error);
+      console.error(error);
       toast.error("Erro ao editar usuário.");
     },
   });
@@ -101,19 +101,19 @@ export default function EditUser({ params }: DetalhesProps) {
   const queryClient = useQueryClient();
   const { mutate: deleteUser, isPending: isDeletePending } = useDeleteUser({
     onSuccess: () => {
-      toast.success(`Usua ${data?.nome_completo} deletado com sucesso!`);
+      toast(`Usua ${data?.nome_completo} deletado com sucesso!`);
       queryClient.invalidateQueries({ queryKey: queryKeys.allUsers() });
       router.push("/medicao");
     },
     onError: (error) => {
-      console.log(error);
+      console.error(error);
       toast.error("Erro ao deletar usuário.");
     },
   });
 
   function handleDelete() {
     const userId = data?.user_id as string;
-    console.log(userId);
+ 
     deleteUser(userId);
   }
 
