@@ -79,7 +79,7 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
   const handleFinalSubmit = () => {
     const new_leitura = {
       medidor_id: medidor.id,
-      mes: 6,
+      mes: 7,
       ano: year,
       leitura_anterior: medidor.ultima_leitura,
       leitura_atual: formData.medicao_atual,
@@ -125,8 +125,57 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
     }
     return text.toUpperCase(); // ✅ Ajuste aqui: Converte o texto para maiúsculas mesmo se não for truncado.
   };
-  const formatarFracao = (valor: number | undefined): string => {
+  const formatarFracao = (
+    valor: number | undefined,
+    type: string,
+    num_relogio: string,
+    nome_loja: string
+  ): string => {
     if (valor === undefined || valor === null) return "-";
+
+    if (type === "Gas") {
+      const valorFormatado = (valor / 10000).toFixed(2);
+      return valorFormatado.replace(".", ",");
+    }
+
+    if (
+      (type === "Agua" && num_relogio === "A09L216748") ||
+      num_relogio === "A09L216747" ||
+      num_relogio === "C105-011000" ||
+      num_relogio === "747800"
+    ) {
+      const valorFormatado = (valor / 10000).toFixed(2);
+      return valorFormatado.replace(".", ",");
+    }
+
+    if (type === "Energia") {
+      if (nome_loja === "MC DONALD'S") {
+        const valorFormatado = (valor / 10).toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+        return valorFormatado;
+      }
+      if (
+        nome_loja === "Hotel Colinas" ||
+        nome_loja === "Mc Donald's" ||
+        nome_loja === "Deli" ||
+        nome_loja === "Nipbr" ||
+        nome_loja === "Central Agua Gelada ( Chill 01 )" ||
+        nome_loja === "Central Agua Gelada ( Chill 02 )"
+      ) {
+        const valorFormatado = (valor / 100).toLocaleString("pt-BR", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        });
+        return valorFormatado;
+      }
+      const valorFormatado = valor.toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+      return valorFormatado;
+    }
 
     // Divide por 100 para converter, e toFixed(2) para 2 casas decimais
     const valorFormatado = (valor / 100).toFixed(2);
@@ -177,9 +226,12 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
       <div className="w-full flex justify-between">
         <span>Consumo</span>
         <span>
-          {medidor.tipo_medicao === "Energia"
-            ? medidor.leituras[0]?.consumo_mensal
-            : formatarFracao(medidor.leituras[0]?.consumo_mensal)}{" "}
+          {formatarFracao(
+            medidor.leituras[0]?.consumo_mensal,
+            medidor.tipo_medicao,
+            medidor.numero_relogio,
+            loja.nome_loja
+          )}{" "}
           {medidor.tipo_medicao === "Energia" ? "kWh" : "m3"}
         </span>
       </div>
@@ -207,7 +259,7 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
               </SheetTitle>
               <SheetTitle className="flex justify-between items-center mt-4">
                 <span className="text-lg font-medium">
-                  {loja.nome_loja} - {loja.numero_loja}
+                  {loja.nome_loja} / {loja.prefixo_loja} - {loja.numero_loja}
                 </span>
                 <span
                   className={`${loja.ativa ? "bg-green-500" : "bg-red-500"} h-5 w-5 rounded-full`}

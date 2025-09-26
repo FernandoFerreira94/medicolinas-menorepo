@@ -1,12 +1,15 @@
 import Image from "next/image";
-import { BsMenuButtonWideFill } from "react-icons/bs";
-import { FaUserCircle } from "react-icons/fa";
-import { TbUserEdit } from "react-icons/tb";
-import { RiFileExcel2Fill } from "react-icons/ri";
-import { IoLogOut } from "react-icons/io5";
+import {
+  TbUserEdit,
+  TbHomeEdit,
+  TbHomePlus,
+  TbTable,
+  TbUserCircle,
+  TbFileExcel,
+  TbLogout2,
+} from "react-icons/tb";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { MdAddBusiness } from "react-icons/md";
 import { TbUserPlus } from "react-icons/tb";
 import { useTheme } from "next-themes";
 import Cookies from "js-cookie";
@@ -82,7 +85,7 @@ export function SideBar() {
               showSideBar ? "justify-start " : "justify-center"
             }`}
           >
-            <BsMenuButtonWideFill size={22} />
+            <TbTable size={22} />
             {showSideBar && <span>Painel</span>}
           </Link>
         </Li>
@@ -96,8 +99,19 @@ export function SideBar() {
                   showSideBar ? "justify-start " : "justify-center"
                 }`}
               >
-                <MdAddBusiness size={26} className="text-gray-100 " />{" "}
+                <TbHomePlus size={26} className="text-gray-100 " />{" "}
                 {showSideBar && <span>Cadastrar loja</span>}
+              </Link>
+            </Li>
+            <Li title="Editar loja">
+              <Link
+                href="/editStore"
+                className={`w-full h-full flex items-center pl-1  gap-2 ${
+                  showSideBar ? "justify-start " : "justify-center"
+                }`}
+              >
+                <TbHomeEdit size={26} className="text-gray-100 " />{" "}
+                {showSideBar && <span>Editar loja</span>}
               </Link>
             </Li>
 
@@ -169,7 +183,7 @@ export function SideBar() {
                   showSideBar ? "justify-start " : "justify-center"
                 }`}
               >
-                <RiFileExcel2Fill size={24} />
+                <TbFileExcel size={24} />
                 {showSideBar && <span>Exporta PDF</span>}
               </Link>
             </Li>
@@ -183,7 +197,7 @@ export function SideBar() {
               showSideBar ? "justify-start " : "justify-center"
             }`}
           >
-            <FaUserCircle size={24} className="text-gray-100" />{" "}
+            <TbUserCircle size={24} className="text-gray-100" />{" "}
             {showSideBar && <span>Perfil</span>}
           </Link>
         </Li>
@@ -196,7 +210,7 @@ export function SideBar() {
             onClick={handleLogout}
             className=" h-full flex items-center gap-2 w-full justify-center  cursor-pointer"
           >
-            <IoLogOut size={26} className="text-gray-100   " />
+            <TbLogout2 size={26} className="text-gray-100   " />
             {showSideBar && <span>Sair</span>}
           </button>
         </Li>

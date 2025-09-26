@@ -25,3 +25,4 @@ export * from "./src/hook/useEditUser";
 export * from "./src/queryKeys";
 export * from "./src/hook/useEditLeituraMedidor";
 export * from "./src/hook/useFetchLojaTabela";
+export * from "./src/hook/useFetchLoja";

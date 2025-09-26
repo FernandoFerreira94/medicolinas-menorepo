@@ -121,6 +121,7 @@ export default function InfoLoja({ params }: DetalhesProps) {
 
     const lastSixLeituras = sortedLeituras.slice(-6);
     chartData = lastSixLeituras.map((leitura) => ({
+      nome_loja: leitura.nome_loja_leitura,
       month: `${leitura.mes}/${leitura.ano}`,
       consumo: leitura.consumo_mensal,
       detalhes: leitura.detalhes_leitura || "Nenhum detalhe disponível",
@@ -399,9 +400,13 @@ export default function InfoLoja({ params }: DetalhesProps) {
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="month"
-                tickLine={true}
+                tickLine
                 tickMargin={10}
-                axisLine={true}
+                axisLine
+                tickFormatter={(value, index) => {
+                  const loja = chartData[index]?.nome_loja;
+                  return `${value} - ${loja}`;
+                }}
               />
               <YAxis dataKey="consumo" />
               <Tooltip content={<CustomTooltip />} />

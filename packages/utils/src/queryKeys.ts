@@ -10,4 +10,5 @@ export const queryKeys = {
     localidade: string | null = null,
     searchQuery: string | null = null
   ) => ["medicoes", tipoMedicao, mes, ano, localidade, searchQuery],
+  loja: (id: string) => ["loja", id],
 };

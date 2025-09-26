@@ -2,10 +2,10 @@ import { supabase } from "../supabase";
 import type { LojaComMedidores } from "../types";
 
 export async function fetchLojas(
-  tipoMedicao: string | null = null,
-  mes: number | null = null,
-  ano: number | null = null,
-  localidade: string | null = null,
+  tipoMedicao?: string | null,
+  mes?: number | null,
+  ano?: number | null,
+  localidade?: string | null,
   searchQuery: string | null = null
 ): Promise<LojaComMedidores[] | null> {
   const baseQuery = () => {

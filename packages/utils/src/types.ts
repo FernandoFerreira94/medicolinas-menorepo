@@ -129,6 +129,7 @@ export interface ChartDataItem {
   consumo: number;
   detalhes: string;
   month: string;
+  nome_loja: string;
 }
 
 export interface TooltipPayload {
