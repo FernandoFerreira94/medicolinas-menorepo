@@ -22,6 +22,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 export default function ExportExcel() {
   const {
@@ -63,7 +64,7 @@ export default function ExportExcel() {
       setVacanLeitura(vacantMetersWithReadings);
       setVacantCount(vacantStores.length);
     }
-  }, [data]);
+  }, [data, setTypeMedicao]);
 
   console.log(data);
 
@@ -106,186 +107,104 @@ export default function ExportExcel() {
         </span>
       </div>
       <div className=" w-full h-full">
-        <Table className="bg-white dark:bg-[#2B2B41] ">
-          <TableCaption>A list of your recent invoices.</TableCaption>
-          <TableHeader>
-            <TableRow
-              className={` hover:bg-trtansparent border bg-[#3D3C6C] text-gray-100  dark:bg-[#151526] text-lg `}
-            >
-              <TableHead className=" text-gray-50 w-20 text-center    ">
-                EUC
-              </TableHead>
-              <TableHead className="text-gray-50  w-70 text-center    ">
-                Nome fantasia
-              </TableHead>
-              <TableHead className="text-gray-50  text-center   ">
-                Relogio
-              </TableHead>
-              <TableHead className=" text-gray-50 text-center   ">
-                leitura mês anterior
-              </TableHead>
-              <TableHead className=" text-gray-50 text-center   ">
-                leitura mês ref
-              </TableHead>
-              <TableHead className=" text-gray-50 text-center   ">
-                consumo mês anterior
-              </TableHead>
-              <TableHead className="text-gray-50  text-center   ">
-                consumo mês ref
-              </TableHead>
-              <TableHead className="text-gray-50  text-center   ">
-                %Var
-              </TableHead>
-              <TableHead className="text-gray-50  text-center   ">
-                Energia pagar mes anterior
-              </TableHead>
-              <TableHead className=" text-gray-50 text-center   ">
-                Energia pagar mes ref
-              </TableHead>
-              <TableHead className=" text-gray-50 text-center   ">
-                Energia &Var
-              </TableHead>
-              <TableHead className=" text-gray-50 text-center   ">
-                C/Taxa
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data &&
-              data
-                .sort((a, b) => {
-                  const customOrder = [
-                    "AE",
-                    "D",
-                    "NS",
-                    "NT",
-                    "QBT",
-                    "QS",
-                    "QT",
-                    "CE",
-                    "QVB",
-                    "EST",
-                    "CAG",
-                    "AT",
-                    " ",
-                  ];
-                  const aPrefix = a.prefixo_loja;
-                  const bPrefix = b.prefixo_loja;
+        <ScrollArea className="w-full rounded-md border whitespace-nowrap">
+          <Table className="bg-white  dark:bg-[#2B2B41] text-lg">
+            <TableHeader>
+              <TableRow className="bg-[#3D3C6C] dark:bg-[#151526] hover:bg-[#3D3C6C] ">
+                <TableHead>EUC</TableHead>
+                <TableHead className="w-20">Nome fantasia</TableHead>
+                <TableHead>Relogio</TableHead>
+                <TableHead>leitura mês anterior</TableHead>
+                <TableHead>leitura mês ref</TableHead>
+                <TableHead>consumo mês anterior</TableHead>
+                <TableHead>consumo mês ref</TableHead>
+                <TableHead>%Var</TableHead>
+                <TableHead>Energia pagar mes anterior</TableHead>
+                <TableHead>Energia pagar mes ref</TableHead>
+                <TableHead>Energia &Var</TableHead>
+                <TableHead>C/Taxa</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {data &&
+                data
+                  .sort((a, b) => {
+                    const customOrder = [
+                      "AE",
+                      "D",
+                      "NS",
+                      "NT",
+                      "QBT",
+                      "QS",
+                      "QT",
+                      "CE",
+                      "QVB",
+                      "EST",
+                      "CAG",
+                      "AT",
+                      " ",
+                    ];
+                    const aPrefix = a.prefixo_loja;
+                    const bPrefix = b.prefixo_loja;
 
-                  const aIndex = customOrder.indexOf(aPrefix);
-                  const bIndex = customOrder.indexOf(bPrefix);
+                    const aIndex = customOrder.indexOf(aPrefix);
+                    const bIndex = customOrder.indexOf(bPrefix);
 
-                  if (aIndex !== bIndex) {
-                    return aIndex - bIndex;
-                  }
+                    if (aIndex !== bIndex) {
+                      return aIndex - bIndex;
+                    }
 
-                  return a.numero_loja.localeCompare(b.numero_loja);
-                })
-                .map((item) => (
-                  <TableRow
-                    key={item.id}
-                    className={` dark:hover:border-b-black dark:hover:bg-transparent border-b-gray-900  text-lg    text-center`}
-                  >
-                    <TableCell
-                      className={` w-20 border-r-2 text-start bg-gray-200/40 dark:bg-[#202034f4] ${
-                        item.ativa ? "" : "text-red-600 dark:text-red-400"
-                      }`}
+                    return a.numero_loja.localeCompare(b.numero_loja);
+                  })
+                  .map((item) => (
+                    <TableRow
+                      key={item.id}
+                      className={`${!item.ativa && "bg-gray-200"} `}
                     >
-                      {item.prefixo_loja} - {item.numero_loja}
-                    </TableCell>
-                    <TableCell
-                      className={`  border-r-2 dark:border-gray-600/40 border-gray-400 text-start ${
-                        item.ativa ? "" : "text-red-600 dark:text-red-400"
-                      }`}
-                    >
-                      {item.nome_loja}
-                    </TableCell>
-                    <TableCell
-                      className={`  border-r-2 dark:border-gray-600/40 border-gray-400 text-center ${
-                        item.ativa ? "" : "text-red-600 dark:text-red-400"
-                      }`}
-                    >
-                      {item.medidores[0].numero_relogio}
-                    </TableCell>
-                    <TableCell
-                      className={`  bg-gray-200/40 border-r-2 dark:border-gray-600/40 border-gray-400  text-end dark:bg-[#202034f4] ${
-                        item.ativa ? "" : "text-red-600 dark:text-red-400"
-                      }`}
-                    >
-                      {item.medidores[0]?.leituras[0]?.leitura_anterior ||
-                        "mes anterior"}
-                    </TableCell>
-                    <TableCell
-                      className={`  border-r-2 dark:border-gray-600/40 border-gray-400 text-end ${
-                        item.ativa ? "" : "text-red-600 dark:text-red-400"
-                      }`}
-                    >
-                      {item.medidores[0]?.leituras[0]?.leitura_atual ||
-                        "mes referente"}
-                    </TableCell>
-                    <TableCell
-                      className={` bg-gray-200/40 border-r-2 dark:border-gray-600/40 border-gray-400 text-end dark:bg-[#202034f4] ${
-                        item.ativa ? "" : "text-red-600 dark:text-red-400"
-                      }`}
-                    >
-                      {item.medidores[0]?.leituras[0]?.consumo_anterior ||
-                        "consumo mes anterior"}
-                    </TableCell>
-                    <TableCell
-                      className={`  border-r-2 dark:border-gray-600/40 border-gray-400 text-end ${
-                        item.ativa ? "" : "text-red-600 dark:text-red-400"
-                      }`}
-                    >
-                      {item.medidores[0]?.leituras[0]?.consumo_mensal ||
-                        "consumo atual"}
-                    </TableCell>
-                    <TableCell
-                      className={`  border-r-2 dark:border-gray-600/40 border-gray-400 text-center ${
-                        item.ativa ? "" : "text-red-600 dark:text-red-400"
-                      }`}
-                    >
-                      {item.medidores[0]?.leituras[0]?.consumo_mensal || "8%"}
-                    </TableCell>
-                    <TableCell
-                      className={`dark:bg-[#202034f4] bg-gray-200/40 border-r-2 dark:border-gray-600 border-gray-400 text-end ${
-                        item.ativa ? "" : "text-red-600 dark:text-red-400"
-                      }`}
-                    >
-                      {"consumo que pago mes anterior"}
-                    </TableCell>
-                    <TableCell
-                      className={`  border-r-2 dark:border-gray-600 border-gray-400 text-end ${
-                        item.ativa ? "" : "text-red-600 dark:text-red-400"
-                      }`}
-                    >
-                      {consumoMensal(
-                        item.medidores[0]?.leituras[0]?.consumo_mensal
-                      )}
-                    </TableCell>
-                    <TableCell
-                      className={`  border-r-2 dark:border-gray-600 border-gray-400 text-center ${
-                        item.ativa ? "" : "text-red-600 dark:text-red-400"
-                      }`}
-                    >
-                      {"-9,5%"}
-                    </TableCell>
-                    <TableCell
-                      className={`dark:bg-[#202034f4] bg-gray-200/40 border-r-2 dark:border-gray-600 border-gray-400 text-center ${
-                        item.ativa ? "" : "text-red-600 dark:text-red-400 "
-                      }`}
-                    >
-                      {"484"}
-                    </TableCell>
-                  </TableRow>
-                ))}
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TableCell colSpan={11}>Total</TableCell>
-              <TableCell className="text-right">$2,500.00</TableCell>
-            </TableRow>
-          </TableFooter>
-        </Table>
+                      <TableCell className="font-semibold ">
+                        {item.prefixo_loja} - {item.numero_loja}
+                      </TableCell>
+                      <TableCell className="w-20 ">{item.nome_loja}</TableCell>
+                      <TableCell>{item.medidores[0].numero_relogio}</TableCell>
+                      <TableCell className="text-center">
+                        {item.medidores[0]?.leituras[0]?.leitura_anterior ||
+                          "mes anterior"}
+                      </TableCell>
+                      <TableCell className="text-center">
+                        {item.medidores[0]?.leituras[0]?.leitura_atual ||
+                          "mes referente"}
+                      </TableCell>
+                      <TableCell className="">
+                        {item.medidores[0]?.leituras[0]?.consumo_anterior ||
+                          "consumo mes anterior"}
+                      </TableCell>
+                      <TableCell>
+                        {item.medidores[0]?.leituras[0]?.consumo_mensal ||
+                          "consumo atual"}
+                      </TableCell>
+                      <TableCell>
+                        {item.medidores[0]?.leituras[0]?.consumo_mensal || "8%"}
+                      </TableCell>
+                      <TableCell>{"consumo que pago mes anterior"}</TableCell>
+                      <TableCell>
+                        {consumoMensal(
+                          item.medidores[0]?.leituras[0]?.consumo_mensal
+                        )}
+                      </TableCell>
+                      <TableCell>{"-9,5%"}</TableCell>
+                      <TableCell className="">{"484"}</TableCell>
+                    </TableRow>
+                  ))}
+            </TableBody>
+            <TableFooter>
+              <TableRow>
+                <TableCell colSpan={11}>Total</TableCell>
+                <TableCell className="text-right">$2,500.00</TableCell>
+              </TableRow>
+            </TableFooter>
+          </Table>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
       </div>
     </Content>
   );

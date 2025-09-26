@@ -125,6 +125,15 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
     }
     return text.toUpperCase(); // ✅ Ajuste aqui: Converte o texto para maiúsculas mesmo se não for truncado.
   };
+  const formatarFracao = (valor: number | undefined): string => {
+    if (valor === undefined || valor === null) return "-";
+
+    // Divide por 100 para converter, e toFixed(2) para 2 casas decimais
+    const valorFormatado = (valor / 100).toFixed(2);
+
+    // O replace substitui o ponto (.) por vírgula (,) para o padrão brasileiro
+    return valorFormatado.replace(".", ",");
+  };
   return (
     <div
       className={`border-l-8  ${isMedidorVerified ? "border-green-500" : "border-red-500"} flex flex-col w-100  gap-2 justify-between py-4 px-4 rounded-xl text-gray-900 dark:text-gray-50 mr-8 mb-8
@@ -167,7 +176,12 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
       </div>
       <div className="w-full flex justify-between">
         <span>Consumo</span>
-        <span>{medidor.leituras[0]?.consumo_mensal}</span>
+        <span>
+          {medidor.tipo_medicao === "Energia"
+            ? medidor.leituras[0]?.consumo_mensal
+            : formatarFracao(medidor.leituras[0]?.consumo_mensal)}{" "}
+          {medidor.tipo_medicao === "Energia" ? "kWh" : "m3"}
+        </span>
       </div>
 
       <div className="w-full flex justify-between gap-6">
