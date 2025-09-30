@@ -8,13 +8,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ModeToggle } from "@/components/ui/modeToggle";
 import { roxoPrimary, useFetchUser } from "@repo/utils";
 import { Title } from "../title";
+import React from "react";
 
 export function Content({
   children,
   title,
 }: {
   children: React.ReactNode;
-  title: string;
+  title: React.ReactNode;
 }) {
   const { showSideBar, setShowSideBar } = useAppContext();
   const { data } = useFetchUser();
@@ -23,16 +24,16 @@ export function Content({
   const firstName = user?.nome_completo.split(" ")[0];
 
   return (
-    <main className="h-full text-gray-900 dark:text-gray-50">
+    <main className="h-full w-full text-gray-900 dark:text-gray-50  max-sm:w-full relative">
       <SideBar />
       <div
         className={`h-full transition-all mr-4 duration-800 ${
           showSideBar ? "ml-62" : "ml-20"
-        }`}
+        }  max-sm:m-0`}
       >
         <div className="flex w-full mt-4 items-center">
           <button
-            className="h-full cursor-pointer"
+            className="h-full cursor-pointer max-sm:hidden "
             onClick={() => setShowSideBar(!showSideBar)}
           >
             {showSideBar ? (
@@ -47,7 +48,7 @@ export function Content({
               />
             )}
           </button>
-          <div className="flex h-full justify-between items-center w-6/12 ">
+          <div className="flex h-full justify-between items-center w-6/12 max-sm:w-full max-sm:flex-col-reverse max-sm:gap-4">
             <h1 className="ml-4 text-2xl font-semibold flex items-center">
               {!user ? (
                 <div className="space-y-2 flex items-center">
@@ -58,12 +59,12 @@ export function Content({
               )}
             </h1>
             <h1
-              className={`ml-4 text-4xl font-bold text-[${roxoPrimary}] dark:text-gray-50 `}
+              className={`ml-4 text-4xl font-bold text-[${roxoPrimary}] dark:text-gray-50 max-sm:hidden`}
             >
               Shopping Colinas
             </h1>
           </div>
-          <div className="float-right ml-auto mr-8">
+          <div className="float-right ml-auto mr-8 max-sm:hidden">
             <ModeToggle />
           </div>
         </div>

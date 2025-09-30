@@ -21,11 +21,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { recoverRegistration, normalizeName, useSignIn } from "@repo/utils";
+import { IoIosEye, IoIosEyeOff } from "react-icons/io";
 
 export default function Login() {
   const { setToken, setUser } = useAppContext();
   const [matriculaVerufy, setMatriculaVerufy] = useState("");
   const [nomeCompleto, setNomeCompleto] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
 
   const { mutate, isPending } = useSignIn({
@@ -87,7 +89,7 @@ export default function Login() {
   };
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-[#3D3C6C] relative">
+    <main className="flex w-full min-h-screen flex-col items-center justify-center bg-[#3D3C6C] relative">
       <div
         className="border w-3/12 min-w-140 h-full bg-gray-50 rounded-2xl flex flex-col items-center py-12 
         max-sm:min-w-10/12 max-sm:py-8"
@@ -183,13 +185,28 @@ export default function Login() {
             className="pl-1 flex flex-col gap-1 max-sm:text-basic"
           >
             Senha
-            <Input
-              placeholder="Digite sua senha"
-              type="password"
-              id="password"
-              name="password"
-              className="max-sm:text-sm max-sm:h-12"
-            />
+            <div className="flex items-center gap-2 relative">
+              <Input
+                placeholder="Digite sua senha"
+                type={showPassword ? "text" : "password"}
+                id="password"
+                name="password"
+                className="max-sm:text-sm max-sm:h-12"
+              />
+              {showPassword ? (
+                <IoIosEyeOff
+                  size={20}
+                  className="absolute right-6 cursor-pointer"
+                  onClick={() => setShowPassword(!showPassword)}
+                />
+              ) : (
+                <IoIosEye
+                  size={20}
+                  className="absolute right-6 cursor-pointer"
+                  onClick={() => setShowPassword(!showPassword)}
+                />
+              )}
+            </div>
           </Label>
 
           <Button type="submit">

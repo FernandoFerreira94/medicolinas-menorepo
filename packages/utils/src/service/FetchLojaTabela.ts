@@ -1,11 +1,11 @@
 import { supabase } from "../supabase";
-import type { LojaComMedidores } from "../types";
+import type { LojaProps } from "../types";
 
 export async function fetchLojasTabela(
   tipoMedicao: string | null = null,
   mes: number,
   ano: number
-): Promise<LojaComMedidores[] | null> {
+): Promise<LojaProps[] | null> {
   // ✅ 1. Calcule o mês e o ano anterior
   const mesAnterior = mes === 1 ? 12 : mes - 1;
 
@@ -39,5 +39,5 @@ export async function fetchLojasTabela(
     throw new Error(error.message);
   }
 
-  return data as LojaComMedidores[] | null;
+  return data as LojaProps[] | null;
 }

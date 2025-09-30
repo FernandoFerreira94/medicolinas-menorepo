@@ -17,6 +17,7 @@ interface UpdateLeituraMedidorVariables {
   leitura_id?: string;
   dataLoja: EditLoja;
   dataLeitura?: EditLeitura;
+  ultima_leitura?: number;
 }
 
 export function useEditLeituraMedidor(

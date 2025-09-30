@@ -38,6 +38,7 @@ import { Button } from "@/components/ui/button";
 
 import { useAppContext } from "@/src/context/useAppContext";
 import { toast } from "sonner";
+import { set } from "date-fns";
 
 export default function InfoLoja({ params }: DetalhesProps) {
   const resolvedParams = React.use(params);
@@ -48,12 +49,13 @@ export default function InfoLoja({ params }: DetalhesProps) {
   const [numero_relogio, setNumero_relogio] = useState("");
   const [quadroDistribuicao, setQuadroDistribuicao] = useState("");
   const [localidade, setLocalidade] = useState("");
-  const [leitura_atual, setLeitura_atual] = useState("");
+  const [leitura_atual, setLeitura_atual] = useState(0);
   const [detalheLeitura, setDetalheLeitura] = useState("");
   const [ativa, setAtiva] = useState(false);
   const [nome_loja, setNome_loja] = useState("");
   const [numero_loja, setNumero_loja] = useState("");
   const [detalheMedidor, setDetalheMedidor] = useState("");
+  const [medicao_atual, setMedicao_atual] = useState("");
 
   const { data, isLoading, error } = useFetchLojaSingle(id, medidorId);
   const [prefixo, setPrefixo] = useState(data?.loja?.prefixo_loja || "");
@@ -166,6 +168,7 @@ export default function InfoLoja({ params }: DetalhesProps) {
 
       mutate({
         medidor_id: data?.medidor?.id,
+        ultima_leitura: leitura_atual,
         loja_id,
         dataMedidor,
         dataLoja,
@@ -187,7 +190,7 @@ export default function InfoLoja({ params }: DetalhesProps) {
     <Content
       title={`${data.loja.nome_loja} - ${data.loja.prefixo_loja} ${data.loja.numero_loja} - Mês referente ${month}/${year}`}
     >
-      <main className="flex  items-center pt-8 gap-32 w-11/12 ">
+      <main className="flex  items-start pt-8 gap-32 w-11/12 max-sm:flex-col max-sm:w-full">
         <section className="w-full ">
           <div className="flex items-center  space-x-2 ">
             {is_admin && (
@@ -333,12 +336,12 @@ export default function InfoLoja({ params }: DetalhesProps) {
               <Label>Leitura mês atual</Label>
               <Input
                 disabled={edit}
-                value={data?.medidor?.leituras[0]?.leitura_atual || ""}
+                value={medicao_atual}
                 className={`border-3 ${edit ? "border-transparent " : "border-gray-700 dark:border-gray-300 "}`}
                 placeholder={
                   data?.medidor?.leituras[0]?.leitura_atual || "Sem leitura"
                 }
-                onChange={(e) => setLeitura_atual(e.target.value)}
+                onChange={(e) => setMedicao_atual(e.target.value)}
                 type="number"
               />
             </div>
@@ -394,8 +397,8 @@ export default function InfoLoja({ params }: DetalhesProps) {
             )}
           </form>
         </section>
-        <section className="w-full  border">
-          <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
+        <section className="w-full  border mt-18 py-8  bg-white dark:bg-[#151526] rounded-xl">
+          <ChartContainer config={chartConfig} className="min-h-[250px] w-full">
             <BarChart accessibilityLayer data={chartData}>
               <CartesianGrid vertical={false} />
               <XAxis

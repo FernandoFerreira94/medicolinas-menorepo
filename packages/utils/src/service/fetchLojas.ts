@@ -1,5 +1,5 @@
 import { supabase } from "../supabase";
-import type { LojaComMedidores } from "../types";
+import type { LojaProps } from "../types";
 
 export async function fetchLojas(
   tipoMedicao?: string | null,
@@ -7,7 +7,7 @@ export async function fetchLojas(
   ano?: number | null,
   localidade?: string | null,
   searchQuery: string | null = null
-): Promise<LojaComMedidores[] | null> {
+): Promise<LojaProps[] | null> {
   const baseQuery = () => {
     let query = supabase.from("lojas").select(`
       *,
@@ -34,7 +34,7 @@ export async function fetchLojas(
     return query;
   };
 
-  let data: LojaComMedidores[] | null = null;
+  let data: LojaProps[] | null = null;
   let error: any = null;
 
   if (searchQuery) {
@@ -78,13 +78,13 @@ export async function fetchLojas(
     const allResults = [...(dataLojas || []), ...(dataMedidores || [])];
     const uniqueLojas = Array.from(new Set(allResults.map((l) => l.id))).map(
       (id) => allResults.find((l) => l.id === id)
-    ) as LojaComMedidores[];
+    ) as LojaProps[];
 
     data = uniqueLojas;
   } else {
     // Se não houver busca, executa a query normal
     const { data: normalData, error: normalError } = await baseQuery();
-    data = normalData as LojaComMedidores[];
+    data = normalData as LojaProps[];
     error = normalError;
   }
 

@@ -7,7 +7,7 @@ import { useAppContext } from "@/src/context/useAppContext";
 import { Card } from "@/src/_componente/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button"; // Importe o componente Button do shadcn/ui
-import { useFetchLojas, LojaComMedidores } from "@repo/utils";
+import { useFetchLojas, LojaProps } from "@repo/utils";
 
 const ITEMS_PER_PAGE = 40; // Define a quantidade inicial de itens a serem exibidos
 
@@ -21,8 +21,8 @@ export default function Dashboard() {
     searchQuery
   );
 
-  const [filteredLojas, setFilteredLojas] = useState<LojaComMedidores[]>([]);
-  const [sortedLojas, setSortedLojas] = useState<LojaComMedidores[]>([]);
+  const [filteredLojas, setFilteredLojas] = useState<LojaProps[]>([]);
+  const [sortedLojas, setSortedLojas] = useState<LojaProps[]>([]);
   const [activeCount, setActiveCount] = useState(0);
   const [vacantCount, setVacantCount] = useState(0);
   const [activeLeituras, setActiveLeituras] = useState(0);

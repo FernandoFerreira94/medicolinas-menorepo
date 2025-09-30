@@ -31,7 +31,8 @@ export interface InputDateProps {
 }
 
 // Tipos Relacionados a Lojas e Medidores
-export interface LojaProps {
+export interface LojaUpdtadeProps {
+  id?: string;
   nome_loja: string;
   numero_loja: string;
   prefixo_loja: string;
@@ -41,61 +42,57 @@ export interface LojaProps {
   tem_agua: boolean;
   tem_gas: boolean;
 }
-
-export interface MedidorDadosForm {
-  tipo_medicao: string;
-  numero_relogio: string;
-  localidade: string;
-  ultima_leitura: number;
-  detalhes: string | null;
-  quadro_distribuicao: string | null;
+export interface LojaProps {
+  id?: string;
+  nome_loja: string;
+  numero_loja: string;
+  prefixo_loja: string;
+  complexo: string;
+  ativa: boolean;
+  tem_energia: boolean;
+  tem_agua: boolean;
+  tem_gas: boolean;
+  medidores: MedidorComLeitura[];
 }
 
-export interface MedidorProps extends MedidorDadosForm {
-  loja_id: string;
+export interface MedidorProps extends Medidores {
+  loja_id?: string;
 }
 
 export interface CreateLojaData {
   loja: LojaProps;
-  medidores: MedidorDadosForm[];
+  medidores: Medidores[];
 }
 
 export interface LeituraProps {
-  leitura_atual: number;
-  consumo_mensal: number;
-  mes: number;
-  ano: number;
-  leitura_anterior: number;
-  created_at: string;
-  consumo_anterior: number;
+  leitura_atual?: number;
+  consumo_mensal?: number;
+  mes?: number;
+  ano?: number;
+  leitura_anterior?: number;
+  created_at?: string;
+  consumo_anterior?: number;
+  foto_url?: string | null;
+  detalhes_leitura?: string | null;
+  nome_loja_leitura?: string;
+  medidor_id?: string;
+  nome_usuario: string;
+  medidor?: string;
 }
 
-export interface Medidor {
-  id: string;
+export interface Medidores {
+  loja_id?: string;
+  id?: string;
   tipo_medicao: string;
   localidade: string;
   numero_relogio: string;
   ultima_leitura: number;
-  detalhes: string | null;
-  data_instalacao: string;
-  leituras: LeituraProps[];
+  detalhes: string;
+  quadro_distribuicao?: string | undefined;
+  data_instalacao?: string;
 }
-
-// Tipos para dados de leitura
-export interface CreateLeituraProps {
-  medidor_id: string;
-  mes: number;
-  ano: number;
-  leitura_anterior: number;
-  leitura_atual: number;
-  foto_url: string | null;
-  nome_usuario: string;
-  detalhes_leitura: string | null;
-  nome_loja_leitura: string;
-}
-
 export interface MedidorComLeitura {
-  id: string;
+  id?: string;
   tipo_medicao: string;
   localidade: string;
   numero_relogio: string;
@@ -103,19 +100,6 @@ export interface MedidorComLeitura {
   detalhes: string;
   data_instalacao: string;
   leituras: LeituraProps[]; // Adicione a leitura aqui, como um array
-}
-
-export interface LojaComMedidores {
-  id: string;
-  prefixo_loja: string;
-  complexo: string;
-  nome_loja: string;
-  numero_loja: string;
-  ativa: boolean;
-  tem_energia: boolean;
-  tem_agua: boolean;
-  tem_gas: boolean;
-  medidores: Medidor[] | MedidorComLeitura[]; // Tipagem ajustada para flexibilidade
 }
 
 export interface DetalhesProps {
@@ -157,4 +141,15 @@ export interface EditLoja {
   nome_loja: string;
   numero_loja: string;
   prefixo_loja: string;
+}
+
+export interface MedidorPayload {
+  id?: string; // Opcional para insert, necessário para update/delete
+  loja_id: string; // Sempre necessário para upsert
+  detalhes: string;
+  numero_relogio: string;
+  localidade: string;
+  quadro_distribuicao?: string; // Opcional
+  tipo_medicao: "Energia" | "Agua" | "Gas"; // Tipo string literal para segurança
+  ultima_leitura: number;
 }

@@ -8,7 +8,7 @@ import {
 import { toast } from "sonner";
 
 import { CreateLeitura } from "../service/CreateLeitura";
-import { CreateLeituraProps } from "../types";
+import { LeituraProps } from "../types";
 
 export function useCreateLeitura(
   tipoMedicao: string | null,
@@ -16,18 +16,16 @@ export function useCreateLeitura(
   ano: number | null,
   localidade: string | null,
   searchQuery: string | null,
-  options?: UseMutationOptions<any, Error, CreateLeituraProps>
+  options?: UseMutationOptions<any, Error, LeituraProps>
 ) {
   const queryClient = useQueryClient();
 
-  return useMutation<any, Error, CreateLeituraProps>({
+  return useMutation<any, Error, LeituraProps>({
     mutationFn: async (variables) => {
       const result = await CreateLeitura(variables);
       return result;
     },
     onSuccess: (data, variables, context) => {
-
-
       if (options?.onSuccess) {
         options.onSuccess(data, variables, context);
       }

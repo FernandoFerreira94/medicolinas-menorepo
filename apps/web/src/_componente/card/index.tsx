@@ -1,6 +1,8 @@
 import { useState } from "react";
+import Link from "next/link";
+
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import type { LojaComMedidores } from "@repo/utils";
 import {
   Sheet,
   SheetContent,
@@ -9,13 +11,17 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { ButtonLoading } from "@/components/ui/buttonLoading";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useAppContext } from "@/src/context/useAppContext";
-import { toast } from "sonner";
-import { useCreateLeitura, useFetchUser } from "@repo/utils";
-import { ButtonLoading } from "@/components/ui/buttonLoading";
-import Link from "next/link";
+import {
+  useCreateLeitura,
+  useFetchUser,
+  LojaProps,
+  formatarFracao,
+} from "@repo/utils";
+import { Textarea } from "@/components/ui/textarea";
 
 const date = new Date();
 const currentDay = date.getDate();
@@ -23,7 +29,7 @@ const currentMonth = date.getMonth() + 1;
 const currentYear = date.getFullYear();
 const currentDate = `${currentDay}/${currentMonth}/${currentYear}`;
 
-export function Card({ loja }: { loja: LojaComMedidores }) {
+export function Card({ loja }: { loja: LojaProps }) {
   const { month, year, typeMedicao, localidade, searchQuery } = useAppContext();
   const { mutate, isPending } = useCreateLeitura(
     typeMedicao,
@@ -79,7 +85,7 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
   const handleFinalSubmit = () => {
     const new_leitura = {
       medidor_id: medidor.id,
-      mes: 7,
+      mes: 8,
       ano: year,
       leitura_anterior: medidor.ultima_leitura,
       leitura_atual: formData.medicao_atual,
@@ -125,64 +131,7 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
     }
     return text.toUpperCase(); // ✅ Ajuste aqui: Converte o texto para maiúsculas mesmo se não for truncado.
   };
-  const formatarFracao = (
-    valor: number | undefined,
-    type: string,
-    num_relogio: string,
-    nome_loja: string
-  ): string => {
-    if (valor === undefined || valor === null) return "-";
 
-    if (type === "Gas") {
-      const valorFormatado = (valor / 10000).toFixed(2);
-      return valorFormatado.replace(".", ",");
-    }
-
-    if (
-      (type === "Agua" && num_relogio === "A09L216748") ||
-      num_relogio === "A09L216747" ||
-      num_relogio === "C105-011000" ||
-      num_relogio === "747800"
-    ) {
-      const valorFormatado = (valor / 10000).toFixed(2);
-      return valorFormatado.replace(".", ",");
-    }
-
-    if (type === "Energia") {
-      if (nome_loja === "MC DONALD'S") {
-        const valorFormatado = (valor / 10).toLocaleString("pt-BR", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        });
-        return valorFormatado;
-      }
-      if (
-        nome_loja === "Hotel Colinas" ||
-        nome_loja === "Mc Donald's" ||
-        nome_loja === "Deli" ||
-        nome_loja === "Nipbr" ||
-        nome_loja === "Central Agua Gelada ( Chill 01 )" ||
-        nome_loja === "Central Agua Gelada ( Chill 02 )"
-      ) {
-        const valorFormatado = (valor / 100).toLocaleString("pt-BR", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        });
-        return valorFormatado;
-      }
-      const valorFormatado = valor.toLocaleString("pt-BR", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
-      return valorFormatado;
-    }
-
-    // Divide por 100 para converter, e toFixed(2) para 2 casas decimais
-    const valorFormatado = (valor / 100).toFixed(2);
-
-    // O replace substitui o ponto (.) por vírgula (,) para o padrão brasileiro
-    return valorFormatado.replace(".", ",");
-  };
   return (
     <div
       className={`border-l-8  ${isMedidorVerified ? "border-green-500" : "border-red-500"} flex flex-col w-100  gap-2 justify-between py-4 px-4 rounded-xl text-gray-900 dark:text-gray-50 mr-8 mb-8
@@ -229,8 +178,9 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
           {formatarFracao(
             medidor.leituras[0]?.consumo_mensal,
             medidor.tipo_medicao,
-            medidor.numero_relogio,
-            loja.nome_loja
+            loja.nome_loja,
+            medidor.leituras[0]?.leitura_anterior,
+            medidor.leituras[0]?.leitura_atual
           )}{" "}
           {medidor.tipo_medicao === "Energia" ? "kWh" : "m3"}
         </span>
@@ -382,8 +332,24 @@ export function Card({ loja }: { loja: LojaComMedidores }) {
                     <Label
                       className={`bg-gray-900 rounded-lg p-2 dark:bg-gray-600 border-2  border-slate-200 `}
                     >
-                      {formData.medicao_atual - medidor.ultima_leitura}
+                      {(formData.medicao_atual - medidor.ultima_leitura) / 100}{" "}
+                      {(medidor.tipo_medicao === "Energia" && "kWh") || "m3"}
                     </Label>
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <span className="font-semibold text-lg">
+                      Detalhe leitura
+                    </span>
+                    <Textarea
+                      className="text-gray-900 dark:text-gray-50 border border-gray-400 rounded-lg px-2 py-2 bg-white"
+                      value={formData.detalhes_leitura || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          detalhes_leitura: e.target.value,
+                        })
+                      }
+                    />
                   </div>
                   <div className="mt-4">
                     Se sim, clique em **Registrar** para salvar os dados.

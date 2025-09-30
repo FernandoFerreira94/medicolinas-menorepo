@@ -1,7 +1,7 @@
 import { supabase } from "../supabase";
-import type { CreateLeituraProps } from "../types";
+import type { LeituraProps } from "../types";
 
-export async function CreateLeitura(new_leitura: CreateLeituraProps) {
+export async function CreateLeitura(new_leitura: LeituraProps) {
   const { data: insertedData, error: insertError } = await supabase
     .from("leituras")
     .insert(new_leitura)

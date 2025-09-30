@@ -26,3 +26,6 @@ export * from "./src/queryKeys";
 export * from "./src/hook/useEditLeituraMedidor";
 export * from "./src/hook/useFetchLojaTabela";
 export * from "./src/hook/useFetchLoja";
+export * from "./src/hook/useFetchLojasString";
+export * from "./src/hook/useUpdateLojaMedidores";
+export * from "./src/actives/FormatValor";

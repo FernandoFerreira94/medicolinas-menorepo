@@ -51,7 +51,6 @@ export default function RegisterStore() {
 
   const { mutate, isPending } = useCreateLoja({
     onSuccess: (data) => {
-
       toast(`Loja ${data.lojaData[0]?.nome_loja} cadastrada com sucesso!`);
 
       resetForm();
@@ -90,6 +89,7 @@ export default function RegisterStore() {
       tem_gas: gas,
       prefixo_loja: prefixo,
       created_at: new Date("2025-06-01").toISOString(),
+      medidores: [],
     };
 
     const medidores = [];
