@@ -14,7 +14,7 @@ interface AppContextType {
   year: number;
   setYear: (year: number) => void;
   typeMedicao: string;
-  setTypeMedicao: (typeMedicao: string) => void;
+  setTypeMedicao: (type: "Energia" | "Agua" | "Gas") => void;
   localidade: string;
   setLocalidade: (localidade: string) => void;
   firstName: string;

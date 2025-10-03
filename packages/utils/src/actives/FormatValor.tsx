@@ -2,8 +2,8 @@ import { no } from "zod/v4/locales";
 
 export const formatarFracao = (
   valor: number | undefined,
-  type: string,
-  nome_loja: string,
+  type?: string,
+  nome_loja?: string,
   medicao_anterior?: number | undefined,
   medicao_atual?: number | undefined
 ): string => {
@@ -20,6 +20,16 @@ export const formatarFracao = (
     const valorFormatado = (valor / 100).toFixed(2);
     return valorFormatado.replace(".", ",");
   }
+  if (type === "Agua" && nome_loja === "Teatro Colinas") {
+    const valorFormatado = (valor / 1).toFixed(2);
+    return valorFormatado.replace(".", ",");
+  }
+
+  if (type !== "Energia" && medicao_anteriorString.length < 6) {
+    const valorFormatado = (valor / 100).toFixed(2);
+    return valorFormatado.replace(".", ",");
+  }
+
   if (type !== "Energia" && medicao_anteriorString.length > 6) {
     const valorFormatado = (valor / 10000).toFixed(2);
     return valorFormatado.replace(".", ",");

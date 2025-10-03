@@ -29,6 +29,9 @@ import {
   ChartDataItem,
   useFetchUser,
   useEditLeituraMedidor,
+  LeituraProps,
+  formatarFracao,
+  formatarMedicao,
 } from "@repo/utils";
 import { Input } from "@/components/ui/input";
 import { Localidade } from "@/src/_componente/dateTipoMedicao/localidade";
@@ -38,7 +41,6 @@ import { Button } from "@/components/ui/button";
 
 import { useAppContext } from "@/src/context/useAppContext";
 import { toast } from "sonner";
-import { set } from "date-fns";
 
 export default function InfoLoja({ params }: DetalhesProps) {
   const resolvedParams = React.use(params);
@@ -186,6 +188,10 @@ export default function InfoLoja({ params }: DetalhesProps) {
     }
   }
 
+  const leituraMonth = data?.medidor?.leituras?.filter(
+    (leitura: LeituraProps) => leitura.mes === month && leitura.ano === year
+  );
+
   return (
     <Content
       title={`${data.loja.nome_loja} - ${data.loja.prefixo_loja} ${data.loja.numero_loja} - Mês referente ${month}/${year}`}
@@ -327,9 +333,8 @@ export default function InfoLoja({ params }: DetalhesProps) {
             <div className="flex flex-col gap-2">
               <Label>Leitura mês anterior</Label>
               <span className="dark:bg-[#151526] border py-2 px-4 rounded-md bg-white">
-                {data.medidor?.leituras[0]?.leitura_anterior
-                  ? data.medidor?.leituras[0]?.leitura_anterior
-                  : data.medidor.ultima_leitura}
+                {formatarMedicao(leituraMonth[0]?.leitura_anterior) ||
+                  formatarMedicao(data?.medidor?.ultima_leitura)}
               </span>{" "}
             </div>
             <div className="flex flex-col gap-2">
@@ -339,7 +344,8 @@ export default function InfoLoja({ params }: DetalhesProps) {
                 value={medicao_atual}
                 className={`border-3 ${edit ? "border-transparent " : "border-gray-700 dark:border-gray-300 "}`}
                 placeholder={
-                  data?.medidor?.leituras[0]?.leitura_atual || "Sem leitura"
+                  formatarMedicao(leituraMonth[0]?.leitura_atual) ||
+                  "Sem leitura"
                 }
                 onChange={(e) => setMedicao_atual(e.target.value)}
                 type="number"
@@ -348,15 +354,13 @@ export default function InfoLoja({ params }: DetalhesProps) {
             <div className="flex flex-col gap-2">
               <Label>Consumo</Label>
               <span className="dark:bg-[#151526] border py-2 px-4 rounded-md bg-white">
-                {data.medidor.leituras.length === 0
-                  ? "Sem leitura"
-                  : data.medidor.leituras[0].consumo_mensal}
+                {leituraMonth[0]?.consumo_mensal || "Sem leitura"}
               </span>{" "}
             </div>
             <div className="flex flex-col gap-2">
               <Label>Foto do relogio</Label>
               <span className="dark:bg-[#151526] border py-2 px-4 rounded-md bg-white">
-                ????
+                {leituraMonth[0]?.foto_url || "Sem foto"}
               </span>{" "}
             </div>
 
@@ -398,7 +402,10 @@ export default function InfoLoja({ params }: DetalhesProps) {
           </form>
         </section>
         <section className="w-full  border mt-18 py-8  bg-white dark:bg-[#151526] rounded-xl">
-          <ChartContainer config={chartConfig} className="min-h-[250px] w-full">
+          <ChartContainer
+            config={chartConfig}
+            className="min-h-[500px] w-full "
+          >
             <BarChart accessibilityLayer data={chartData}>
               <CartesianGrid vertical={false} />
               <XAxis

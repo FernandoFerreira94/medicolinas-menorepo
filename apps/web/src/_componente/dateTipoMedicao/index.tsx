@@ -48,49 +48,26 @@ export function DateTipoMedicao() {
 
   const renderizarOpcoesDeMedicao = () => {
     // ... (restante do seu código da função renderizarOpcoesDeMedicao)
-    if (
-      !user ||
-      (user.funcao !== "Bombeiro" &&
-        user.funcao !== "M4-Serviços Gerais" &&
-        user.funcao !== "M5-Eletricista")
-    ) {
-      return (
-        <>
-          <SelectItem value="Energia" className="flex items-center gap-2">
-            Energia
-          </SelectItem>
-          <SelectItem value="Agua" className="flex items-center gap-2">
-            Água
-          </SelectItem>
-          <SelectItem value="Gas" className="flex items-center gap-2">
-            Gás
-          </SelectItem>
-        </>
-      );
-    }
 
-    switch (user.funcao) {
-      case "Bombeiro":
-        return (
-          <SelectItem value="Gas" className="flex items-center gap-2">
-            Gás
-          </SelectItem>
-        );
-      case "M4-Serviços Gerais":
-        return (
-          <SelectItem value="Agua" className="flex items-center gap-2">
-            Água
-          </SelectItem>
-        );
-      case "M5-Eletricista":
-        return (
+    return (
+      <>
+        {user?.permissao_energia && (
           <SelectItem value="Energia" className="flex items-center gap-2">
             Energia
           </SelectItem>
-        );
-      default:
-        return null;
-    }
+        )}
+        {user?.permissao_agua && (
+          <SelectItem value="Agua" className="flex items-center gap-2">
+            Água
+          </SelectItem>
+        )}
+        {user?.permissao_gas && (
+          <SelectItem value="Gas" className="flex items-center gap-2">
+            Gás
+          </SelectItem>
+        )}
+      </>
+    );
   };
 
   return (

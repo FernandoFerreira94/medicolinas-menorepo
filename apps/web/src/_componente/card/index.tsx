@@ -20,6 +20,7 @@ import {
   useFetchUser,
   LojaProps,
   formatarFracao,
+  formatarMedicao,
 } from "@repo/utils";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -132,9 +133,11 @@ export function Card({ loja }: { loja: LojaProps }) {
     return text.toUpperCase(); // ✅ Ajuste aqui: Converte o texto para maiúsculas mesmo se não for truncado.
   };
 
+  const nomePrefixo = `${loja.prefixo_loja} - ${loja.numero_loja}`;
+
   return (
     <div
-      className={`border-l-8  ${isMedidorVerified ? "border-green-500" : "border-red-500"} flex flex-col w-100  gap-2 justify-between py-4 px-4 rounded-xl text-gray-900 dark:text-gray-50 mr-8 mb-8
+      className={`border-l-8  ${isMedidorVerified ? "border-green-500" : "border-red-500"} flex flex-col w-100  gap-1 justify-between py-4 px-4 rounded-xl text-gray-900 dark:text-gray-50 mr-8 mb-8
       bg-white dark:bg-[#151526] hover:shadow-[2px_2px_10px_4px_#A7B3C3,-2px_-2px_10px_#FFFFFF] transition-shadow duration-300 shadow-xl`}
       key={loja.id}
     >
@@ -142,12 +145,12 @@ export function Card({ loja }: { loja: LojaProps }) {
         <span title={loja.nome_loja} className="text-lg font-semibold">
           {truncateText(loja.nome_loja, 17)}
         </span>
-        <div className="flex gap-2">
+        <div className="flex gap-2 ">
           <span className="text-lg font-semibold">
-            {loja.prefixo_loja} - {loja.numero_loja}
+            {truncateText(nomePrefixo, 17)}
           </span>
           <span
-            className={`${loja.ativa ? "bg-green-500" : "bg-red-500"} rounded-full my-1.5 px-2`}
+            className={`${loja.ativa ? "bg-green-500" : "bg-red-500"} rounded-full my-1.5 h-4 w-4 `}
           ></span>
         </div>
       </div>
@@ -164,13 +167,15 @@ export function Card({ loja }: { loja: LojaProps }) {
         <span>
           {" "}
           {medidor.leituras[0]?.leitura_anterior
-            ? medidor.leituras[0]?.leitura_anterior
-            : medidor.ultima_leitura}
+            ? formatarMedicao(medidor.leituras[0]?.leitura_anterior)
+            : formatarMedicao(medidor.ultima_leitura)}
         </span>
       </div>
       <div className="w-full flex justify-between">
         <span>Leitura atual</span>
-        <span>{medidor.leituras[0]?.leitura_atual || "--- ---"}</span>
+        <span>
+          {formatarMedicao(medidor.leituras[0]?.leitura_atual) || "--- ---"}
+        </span>
       </div>
       <div className="w-full flex justify-between">
         <span>Consumo</span>

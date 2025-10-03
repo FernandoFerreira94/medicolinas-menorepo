@@ -6,7 +6,7 @@ export const CustomTooltip = ({ active, payload, label }: TooltipPayload) => {
     const data = payload[0].payload;
 
     return (
-      <div className="bg-[#151526] border border-gray-700 p-3 rounded shadow-lg text-sm text-gray-200">
+      <div className="bg-[#151526] border border-gray-700 p-3  rounded shadow-lg text-sm text-gray-200">
         <p className="font-semibold">{`Mês: ${label}`}</p>
         <p className="font-bold text-lg text-blue-400">{`Consumo: ${data.consumo}`}</p>
         <p className="text-gray-400 mt-2">Detalhes : {data.detalhes}</p>
@@ -15,8 +15,6 @@ export const CustomTooltip = ({ active, payload, label }: TooltipPayload) => {
   }
   return null;
 };
-
-
 
 export const chartConfig = {
   consumo: {

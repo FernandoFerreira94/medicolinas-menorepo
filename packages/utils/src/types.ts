@@ -65,8 +65,8 @@ export interface CreateLojaData {
 }
 
 export interface LeituraProps {
-  leitura_atual?: number;
-  consumo_mensal?: number;
+  leitura_atual: number;
+  consumo_mensal: number;
   mes?: number;
   ano?: number;
   leitura_anterior?: number;
@@ -86,7 +86,7 @@ export interface Medidores {
   tipo_medicao: string;
   localidade: string;
   numero_relogio: string;
-  ultima_leitura: number;
+  ultima_leitura?: number;
   detalhes: string;
   quadro_distribuicao?: string | undefined;
   data_instalacao?: string;

@@ -13,7 +13,7 @@ interface UpdateLojaAndMedidoresInput {
   lojaPayload: LojaUpdtadeProps;
 
   medidoresStates: {
-    ultima_leitura: number;
+    ultima_leitura?: number;
     energia: Medidores;
     agua: Medidores;
     gas: Medidores;

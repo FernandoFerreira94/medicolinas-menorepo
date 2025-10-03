@@ -22,7 +22,9 @@ export function AppProvider({ children }: AppProviderProps) {
   const [dateFull, setDateFull] = useState<string>(currentDate);
   const [month, setMonth] = useState<number>(currentMonth);
   const [year, setYear] = useState<number>(currentYear);
-  const [typeMedicao, setTypeMedicao] = useState<string>("");
+  const [typeMedicao, setTypeMedicao] = useState<"Energia" | "Agua" | "Gas">(
+    "Energia"
+  );
   const [localidade, setLocalidade] = useState<string>("");
   const [firstName, setFirstName] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");

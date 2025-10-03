@@ -29,3 +29,4 @@ export * from "./src/hook/useFetchLoja";
 export * from "./src/hook/useFetchLojasString";
 export * from "./src/hook/useUpdateLojaMedidores";
 export * from "./src/actives/FormatValor";
+export * from "./src/actives/FormatMedicao";
