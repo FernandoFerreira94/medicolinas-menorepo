@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Content } from "@/src/_componente/content";
 import { InputDate } from "@/components/ui/inputDate";
 import {
@@ -10,28 +10,42 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAppContext } from "@/src/context/useAppContext";
-import { useFetchLojaTabela } from "@repo/utils";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+  useFetchLojaTabela,
+  useCreateCusto,
+  useFechCusto,
+  useUpdateCusto,
+} from "@repo/utils";
 import { Button } from "@/components/ui/button";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
+import { Tabela } from "./calculoTable/tabela";
 
 export default function ExportExcel() {
-  const { month, year = 8, typeMedicao, setTypeMedicao } = useAppContext();
+  const { month, year, typeMedicao, setTypeMedicao } = useAppContext();
+  const custoRateioRef = useRef<HTMLInputElement>(null);
 
   const { data } = useFetchLojaTabela(typeMedicao, month, year);
+  const { data: dataCusto } = useFechCusto({
+    mes_custo: month,
+    ano_custo: year,
+    tipo_custo: typeMedicao,
+  });
+  const { mutate } = useCreateCusto();
+  const { mutate: mutateCusto } = useUpdateCusto();
 
   const [activeLeituras, setActiveLeituras] = useState(0);
   const [activeCount, setActiveCount] = useState(0);
   const [vacanLeitura, setVacanLeitura] = useState(0);
   const [vacantCount, setVacantCount] = useState(0);
+
+  useEffect(() => {
+    if (dataCusto) {
+      custoRateioRef.current!.value = dataCusto?.valor_custo;
+    } else {
+      custoRateioRef.current!.value = "";
+    }
+  }, [dataCusto, typeMedicao, month, year]);
 
   useEffect(() => {
     if (data && Array.isArray(data)) {
@@ -59,46 +73,82 @@ export default function ExportExcel() {
       setVacanLeitura(vacantMetersWithReadings);
       setVacantCount(vacantStores.length);
     }
-  }, [data, setTypeMedicao]);
+  }, [data]);
 
-  function calcularDiferencaPercentual(
-    consumoAtual: number,
-    consumoAnterior: number
-  ): number {
-    if (consumoAnterior + consumoAtual === 0) {
-      return 0; // caso ambos sejam zero
+  function handleCustoRateio() {
+    const newCusto = {
+      valor_custo: Number(custoRateioRef.current?.value), // Converte para número se for uma stringcustoRateio,
+      mes_custo: month,
+      ano_custo: year,
+      tipo_custo: typeMedicao,
+    };
+
+    if (newCusto.valor_custo === 0) {
+      toast.warning("Por favor, preencha o custo.");
+      return;
     }
 
-    if (consumoAnterior === 0) {
-      return 100; // caso só o anterior seja zero
-    }
-
-    const percentual = (consumoAtual / consumoAnterior - 1) * 100;
-    return parseFloat(percentual.toFixed(2));
+    mutate(newCusto);
   }
 
-  function formatFracao(valor: number, type: string) {
-    if (type === "Gas") {
-      const valorFormatado = (valor / 10000).toFixed(2);
-      return valorFormatado.replace(".", ",");
+  function handleEditCusto() {
+    const editCusto = {
+      valor_custo: Number(custoRateioRef.current?.value), // Converte para número se for uma stringcustoRateio,
+    };
+
+    if (dataCusto?.valor_custo === custoRateioRef) {
+      toast.warning("Por favor, modifique o custo caso queira alterar.");
+      return;
     }
-    const valorFormatado = (valor / 1).toFixed(2);
-    return valorFormatado.replace(".", ",");
+
+    mutateCusto({
+      filtro: {
+        mes_custo: month,
+        ano_custo: year,
+        tipo_custo: typeMedicao,
+      },
+      payload: editCusto,
+    });
   }
 
-  function getPercentualClass(percentual: number): string {
-    if (percentual > 20 || percentual === 0) {
-      return "text-red-600 bg-red-200/40 ";
-    } else if (percentual < -20) {
-      return "text-yellow-600 bg-yellow-200/40";
-    } else {
-      return "text-green-600 bg-green-200/40";
-    }
+  function handleExportExcel() {
+    if (
+      custoRateioRef.current?.value === "" ||
+      custoRateioRef === null ||
+      custoRateioRef === undefined
+    )
+      toast.warning("Por favor, preencha o campo Custo Unitário.");
+    custoRateioRef.current?.focus();
+    return;
   }
-  console.log(data);
+
+  function Span({ text }: { text: string }) {
+    return (
+      <span
+        className="w-full border py-2 px-4 rounded-lg font-normal bg-white border-gray-600 text-gray-900
+       dark:bg-[#151526] dark:text-gray-50"
+      >
+        {text}
+      </span>
+    );
+  }
+
+  function SpanLabel({ children }: { children: React.ReactNode }) {
+    return (
+      <span className="flex items-center gap-2 font-medium">{children}</span>
+    );
+  }
+
+  const unit = () => {
+    if (typeMedicao !== "Energia") return "M3";
+    else {
+      return "Kwh";
+    }
+  };
+
   return (
     <Content title="Lista ">
-      <section className="items-end gap-12 mt-8 flex w-full">
+      <section className="items-end gap-18 mt-8 flex w-full">
         <div className="flex gap-16 items-end ">
           <InputDate />
           <div className="w-40 h-full flex items-end">
@@ -114,197 +164,92 @@ export default function ExportExcel() {
             </Select>
           </div>
         </div>
-        <div className="w-full flex justify-end">
+        <div className="w-full flex  ">
           <Button
-            className="w-80 "
+            className="w-80 ml-auto mr-8"
             variant={"default"}
+            onClick={handleExportExcel}
           >{`Export Leitura ${typeMedicao} - ${month}/${year}`}</Button>
         </div>
       </section>
-      <div className="mt-4 py-4 text-lg flex gap-4 font-semibold w-full justify-start pr-9">
+      <div className="mt-4 py-4 text-lg flex gap-4 font-semibold items-center w-full justify-start pr-9 ">
         <span className="text-green-500">
           Ativos ( {activeLeituras} / {activeCount} )
         </span>
-        <span className="text-red-400">
+        <span className="text-red-400 ">
           Vagos ( {vacanLeitura} / {vacantCount} )
         </span>
+
+        <span className="text-base flex items-center gap-4">
+          Custo Unitário Conta/Rateio:
+          <div className="relative">
+            <Input
+              ref={custoRateioRef}
+              placeholder="Informe o valor a cobrar"
+              title="Digite o custo da cobrança"
+              className="w-35  h-9 relative text-gray-900 dark:text-gray-50 "
+              type="number"
+            />{" "}
+            {dataCusto !== undefined && (
+              <span className="text-sm absolute right-10 top-2 text-gray-400">
+                R$
+              </span>
+            )}
+          </div>
+          {dataCusto === undefined ? (
+            <Button onClick={handleCustoRateio} className="w-30 h-9">
+              Registrar valor
+            </Button>
+          ) : (
+            <Button onClick={handleEditCusto} className="w-30 h-9">
+              Editar valor
+            </Button>
+          )}
+        </span>
+      </div>
+      <h3 className="font-semibold text-xl">Medição shopping</h3>
+      <div className="w-full flex gap-12 my-12">
+        <div className="flex flex-col gap-4 ">
+          <h3 className="font-semibold text-lg">Consumo {unit()}</h3>
+          <SpanLabel>
+            Total Espaço (Relogios) {unit()} : <Span text="totalRelogios" />
+          </SpanLabel>
+          <SpanLabel>
+            Valor Geral Raterio {unit()}:
+            <Span text="totalRelogios" />
+          </SpanLabel>
+          <SpanLabel>
+            Total Central de Ar Condicionado {unit()}:
+            <Span text="totalRelogios" />
+          </SpanLabel>
+        </div>
+        <div className="flex flex-col gap-4 ">
+          <h3 className="font-semibold text-lg">Valor total</h3>
+          <SpanLabel>
+            Total Espaço (Relogios) : <Span text="totalRelogios" />
+          </SpanLabel>
+          <SpanLabel>
+            Valor Geral Raterio <Span text="totalRelogios" />
+          </SpanLabel>
+          <SpanLabel>
+            Total Central de Ar Condicionado :<Span text="totalRelogios" />
+          </SpanLabel>
+        </div>
+        <div className="flex flex-col gap-4 ">
+          <h3 className="font-semibold text-lg">%Varl</h3>
+          <SpanLabel>
+            Total Espaço (Relogios) : <Span text="totalRelogios" />
+          </SpanLabel>
+          <SpanLabel>
+            Valor Geral Raterio <Span text="totalRelogios" />
+          </SpanLabel>
+          <SpanLabel>
+            Total Central de Ar Condicionado :<Span text="totalRelogios" />
+          </SpanLabel>
+        </div>
       </div>
       <div className=" w-full h-full ">
-        <ScrollArea className="w-full rounded-md border whitespace-nowrap">
-          <Table className="bg-white dark:bg-[#2B2B41] text-lg relative">
-            <TableHeader className="sticky top-0 z-20 ">
-              <TableRow className="bg-[#3D3C6C] dark:bg-[#151526] hover:bg-[#3D3C6C]">
-                <TableHead rowSpan={2}>EUC</TableHead>
-                <TableHead rowSpan={2}>Nome fantasia</TableHead>
-                <TableHead rowSpan={2}>Relógio</TableHead>
-
-                <TableHead
-                  colSpan={2}
-                  className="text-center border-x-2 border-gray-800 px-20"
-                >
-                  Leitura Relógio
-                </TableHead>
-                <TableHead
-                  colSpan={3}
-                  className="text-center border-x-2 border-gray-800 px-20"
-                >
-                  Consumo
-                </TableHead>
-                <TableHead
-                  colSpan={4}
-                  className="text-center border-x-2 border-gray-800 px-20"
-                >
-                  {typeMedicao === "Energia" && "Energia"}
-                  {typeMedicao === "Agua" && "Agua"}
-                  {typeMedicao === "Gas" && "Gas"} loja a pagar
-                </TableHead>
-              </TableRow>
-
-              {/* Segunda linha para detalhar Leitura Relógio */}
-              <TableRow className="bg-[#3D3C6C] dark:bg-[#151526] hover:bg-[#3D3C6C] ">
-                <TableHead className="border-x-2 px-6 border-gray-800 text-center">
-                  mês anterior
-                </TableHead>
-                <TableHead className="border-x-2 px-12 border-gray-800 text-center">
-                  mês ref
-                </TableHead>
-                <TableHead className="px-8 border-x-2 border-gray-800">
-                  {" "}
-                  mês anterior
-                </TableHead>
-                <TableHead className="px-8 border-x-2 border-gray-800">
-                  {" "}
-                  mês ref
-                </TableHead>
-                <TableHead className="text-center border-x-2 border-gray-800">
-                  %Var
-                </TableHead>
-                <TableHead className="border-x-2 px-6 border-gray-800 text-center">
-                  Energia pagar mês anterior
-                </TableHead>
-                <TableHead className="border-x-2 px-6 border-gray-800 text-center">
-                  Energia pagar mês ref
-                </TableHead>
-                <TableHead className="border-x-2 px-6 border-gray-800 text-center">
-                  Energia &Var
-                </TableHead>
-                <TableHead className="border-x-2 px-6 border-gray-800 text-center">
-                  C/Taxa
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data &&
-                data
-                  .sort((a, b) => {
-                    const customOrder = [
-                      "AE",
-                      "TR",
-                      "D",
-                      "NS",
-                      "NT",
-                      "QBT",
-                      "QS",
-                      "QT",
-                      "CE",
-                      "QVB",
-                      "EST",
-                      "CAG",
-                      "AT",
-                      " ",
-                      "",
-                    ];
-
-                    const aPrefix = a.prefixo_loja || "";
-                    const bPrefix = b.prefixo_loja || "";
-
-                    let aIndex = customOrder.indexOf(aPrefix);
-                    let bIndex = customOrder.indexOf(bPrefix);
-
-                    // Se não existir no customOrder, manda pro final
-                    if (aIndex === -1) aIndex = customOrder.length;
-                    if (bIndex === -1) bIndex = customOrder.length;
-
-                    if (aIndex !== bIndex) {
-                      return aIndex - bIndex;
-                    }
-
-                    // Comparação numérica (se numero_loja for string)
-                    return Number(a.numero_loja) - Number(b.numero_loja);
-                  })
-
-                  .map((item) => {
-                    return (
-                      <TableRow
-                        key={item.id}
-                        className={`${!item.ativa && "bg-red-200/30 border border-b-red-500"} text-center hover:bg-gray-500/40`}
-                      >
-                        <TableCell className="font-semibold text-start">
-                          {item.prefixo_loja} - {item.numero_loja}
-                        </TableCell>
-                        <TableCell className="text-start">
-                          {item.nome_loja}
-                        </TableCell>
-                        <TableCell className=" text-start">
-                          {item.medidores[0].numero_relogio}
-                        </TableCell>
-                        {/* 🚨 LEITURA MÊS ANTERIOR (Valor da Leitura ATUAL do MÊS PASSADO) */}
-                        <TableCell>
-                          {item.medidores[0]?.leituras[1]?.leitura_anterior}
-                        </TableCell>
-                        {/* LEITURA MÊS REF (Valor da Leitura ATUAL do MÊS DE REFERÊNCIA) */}
-                        <TableCell className="font-semibold">
-                          {item.medidores[0]?.leituras[1]?.leitura_atual}
-                        </TableCell>
-                        {/* CONSUMO MÊS ANTERIOR (Valor do Consumo MENSAL do MÊS PASSADO) */}
-                        <TableCell>
-                          {formatFracao(
-                            item.medidores[0]?.leituras[0]?.consumo_mensal,
-                            item.medidores[0]?.tipo_medicao
-                          )}
-                        </TableCell>
-                        {/* CONSUMO MÊS REF (Valor do Consumo MENSAL do MÊS DE REFERÊNCIA) */}
-                        <TableCell className="font-semibold">
-                          {formatFracao(
-                            item.medidores[0]?.leituras[1]?.consumo_mensal,
-                            item.medidores[0]?.tipo_medicao
-                          )}
-                        </TableCell>
-                        <TableCell
-                          className={`px-12 font-semibold ${getPercentualClass(
-                            calcularDiferencaPercentual(
-                              item.medidores[0]?.leituras[1]?.consumo_mensal,
-                              item.medidores[0]?.leituras[0]?.consumo_mensal
-                            )
-                          )} `}
-                        >
-                          {calcularDiferencaPercentual(
-                            item.medidores[0]?.leituras[1]?.consumo_mensal,
-                            item.medidores[0]?.leituras[0]?.consumo_mensal
-                          )}{" "}
-                          %
-                        </TableCell>
-                        {/* ENERGIA PAGAR MÊS ANTERIOR (Custo calculado do MÊS PASSADO) */}
-                        <TableCell></TableCell>
-                        {/* ENERGIA PAGAR MÊS REF (Custo calculado do MÊS DE REFERÊNCIA) */}
-                        <TableCell className="font-semibold"></TableCell>
-                        {/* ENERGIA &Var (Variação Percentual do Custo - Assumindo que o %Var de consumo serve) */}
-                        <TableCell></TableCell>{" "}
-                        {/* Mantenho o placeholder para o cálculo de custo */}
-                        <TableCell className="font-semibold">{"484"}</TableCell>
-                      </TableRow>
-                    );
-                  })}
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TableCell colSpan={11}>Total</TableCell>
-                <TableCell className="text-right">$2,500.00</TableCell>
-              </TableRow>
-            </TableFooter>
-          </Table>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+        <Tabela custoRateioRef={Number(custoRateioRef.current?.value)} />
       </div>
     </Content>
   );

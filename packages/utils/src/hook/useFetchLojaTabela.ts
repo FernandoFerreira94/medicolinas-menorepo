@@ -1,7 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchLojasTabela } from "../service/FetchLojaTabela";
 import { queryKeys } from "../queryKeys";
-
 export function useFetchLojaTabela(
   tipoMedicao: string,
   mes: number,

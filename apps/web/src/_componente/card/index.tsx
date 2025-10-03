@@ -21,6 +21,7 @@ import {
   LojaProps,
   formatarFracao,
   formatarMedicao,
+  truncateText,
 } from "@repo/utils";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -126,12 +127,6 @@ export function Card({ loja }: { loja: LojaProps }) {
   const shouldDisableButton = medidorJaLidoNoMes || 26 < 25;
 
   // Função para limitar o texto
-  const truncateText = (text: string, maxLength: number) => {
-    if (text.length > maxLength) {
-      return text.substring(0, maxLength).toUpperCase() + "...";
-    }
-    return text.toUpperCase(); // ✅ Ajuste aqui: Converte o texto para maiúsculas mesmo se não for truncado.
-  };
 
   const nomePrefixo = `${loja.prefixo_loja} - ${loja.numero_loja}`;
 

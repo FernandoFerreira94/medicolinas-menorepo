@@ -150,6 +150,19 @@ export interface MedidorPayload {
   numero_relogio: string;
   localidade: string;
   quadro_distribuicao?: string; // Opcional
-  tipo_medicao: "Energia" | "Agua" | "Gas"; // Tipo string literal para segurança
+  tipo_medicao: string; // Tipo string literal para segurança
   ultima_leitura: number;
+}
+
+export interface CustoProps {
+  valor_custo: number;
+  mes_custo?: number;
+  ano_custo?: number;
+  tipo_custo?: string;
+}
+
+export interface FetchCusto {
+  mes_custo: number;
+  ano_custo: number;
+  tipo_custo: string;
 }
