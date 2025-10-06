@@ -20,6 +20,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Tabela } from "./calculoTable/tabela";
+import { calcularSomaEnergia } from "./calculoTable/action/SomaEnergia";
+import { calculoValorPagar } from "./calculoTable/action/ValorPagar";
+import { totalGeralFormatado } from "./calculoTable/action/valorFormatado";
 
 export default function ExportExcel() {
   const { month, year, typeMedicao, setTypeMedicao } = useAppContext();
@@ -33,20 +36,22 @@ export default function ExportExcel() {
   });
   const { mutate } = useCreateCusto();
   const { mutate: mutateCusto } = useUpdateCusto();
+  const somaTotalEnergia = calcularSomaEnergia(data);
+  console.log(somaTotalEnergia);
 
   const [activeLeituras, setActiveLeituras] = useState(0);
   const [activeCount, setActiveCount] = useState(0);
   const [vacanLeitura, setVacanLeitura] = useState(0);
   const [vacantCount, setVacantCount] = useState(0);
-
+  /*
   useEffect(() => {
     if (dataCusto) {
-      custoRateioRef.current!.value = dataCusto?.valor_custo;
+      custoRateioRef.current.value = dataCusto?.valor_custo;
     } else {
-      custoRateioRef.current!.value = "";
+      custoRateioRef.current.value = "";
     }
   }, [dataCusto, typeMedicao, month, year]);
-
+ */
   useEffect(() => {
     if (data && Array.isArray(data)) {
       const activeStores = data.filter((item) => item.ativa === true);
@@ -74,7 +79,7 @@ export default function ExportExcel() {
       setVacantCount(vacantStores.length);
     }
   }, [data]);
-
+  /*
   function handleCustoRateio() {
     const newCusto = {
       valor_custo: Number(custoRateioRef.current?.value), // Converte para número se for uma stringcustoRateio,
@@ -146,9 +151,25 @@ export default function ExportExcel() {
     }
   };
 
+  const valorPagarEspacoRelogio = totalGeralFormatado(
+    calculoValorPagar(
+      Number(custoRateioRef.current?.value),
+      somaTotalEnergia.totalEspacoRelogio
+    )
+  );
+
+  const valorPagarTotal = (valor: number) => {
+    const result = calculoValorPagar(
+      Number(custoRateioRef.current?.value),
+      valor
+    );
+
+    return totalGeralFormatado(result);
+  };
+ */
   return (
-    <Content title="Lista ">
-      <section className="items-end gap-18 mt-8 flex w-full">
+    <Content title="Tabela de consumo">
+      <section className="items-end  mt-8 flex w-full">
         <div className="flex gap-16 items-end ">
           <InputDate />
           <div className="w-40 h-full flex items-end">
@@ -164,6 +185,7 @@ export default function ExportExcel() {
             </Select>
           </div>
         </div>
+        {/* 
         <div className="w-full flex  ">
           <Button
             className="w-80 ml-auto mr-8"
@@ -171,82 +193,128 @@ export default function ExportExcel() {
             onClick={handleExportExcel}
           >{`Export Leitura ${typeMedicao} - ${month}/${year}`}</Button>
         </div>
+        */}
       </section>
-      <div className="mt-4 py-4 text-lg flex gap-4 font-semibold items-center w-full justify-start pr-9 ">
+
+      {/* 
+      <h3 className="font-semibold text-xl">Medição shopping</h3>
+      <span className="text-base flex items-center gap-4 mt-2">
+    
+        Custo Unitário Conta/Rateio:
+        <div className="relative">
+          <Input
+            ref={custoRateioRef}
+            placeholder="Informe o valor a cobrar"
+            title="Digite o custo da cobrança"
+            className="w-50  h-12 relative text-gray-900 dark:text-gray-50 "
+            type="number"
+          />{" "}
+          {dataCusto !== undefined && (
+            <span className="text-sm absolute right-10 top-4 text-gray-400">
+              R$
+              </span>
+          )}
+        </div>
+        {dataCusto === undefined ? (
+          <Button onClick={handleCustoRateio} className="w-30 h-9">
+            Registrar valor
+          </Button>
+        ) : (
+          <Button onClick={handleEditCusto} className="w-30 h-9">
+            Editar valor
+          </Button>
+        )}
+      </span>
+           
+      <div className="w-full grid grid-cols-5  gap-12 mt-4 mb-4 items-center justify-start">
+        <div className="grid gap-4 ">
+          <h3 className="font-semibold text-lg">Consumo {unit()}</h3>
+          <SpanLabel>
+            Total Espaço (Relogios) {unit()} :{" "}
+            <Span
+              text={
+                (typeMedicao === "Energia" &&
+                  totalGeralFormatado(somaTotalEnergia.totalEspacoRelogio)) ||
+                "0"
+              }
+            />
+          </SpanLabel>
+          <SpanLabel>
+            Total Central de Ar Condicionado {unit()}:
+            <Span
+              text={
+                (typeMedicao === "Energia" &&
+                  totalGeralFormatado(somaTotalEnergia.totalArCondicionado)) ||
+                "0"
+              }
+            />
+          </SpanLabel>
+          <SpanLabel>
+            Valor Geral Raterio {unit()}:
+            <Span
+              text={
+                (typeMedicao === "Energia" &&
+                  totalGeralFormatado(somaTotalEnergia.totalGeral)) ||
+                " 0"
+              }
+            />
+          </SpanLabel>
+        </div>
+        <div className="grid  gap-4 ">
+          <h3 className="font-semibold text-lg">Valor total</h3>
+          <SpanLabel>
+            Total Espaço (Relogios) :{" "}
+            <Span
+              text={
+                (typeMedicao === "Energia" &&
+                  valorPagarTotal(somaTotalEnergia.totalEspacoRelogio)) ||
+                "0"
+              }
+            />
+          </SpanLabel>
+          <SpanLabel>
+            Total Central de Ar Condicionado :
+            <Span
+              text={
+                (typeMedicao === "Energia" &&
+                  valorPagarTotal(somaTotalEnergia.totalArCondicionado)) ||
+                "0"
+              }
+            />
+          </SpanLabel>
+          <SpanLabel>
+            Valor Geral Raterio{" "}
+            <Span
+              text={
+                (typeMedicao === "Energia" &&
+                  valorPagarTotal(somaTotalEnergia.totalGeral)) ||
+                "0"
+              }
+            />
+          </SpanLabel>
+        </div>
+        <div className="grid gap-4 ">
+          <h3 className="font-semibold text-lg">%Varl</h3>
+          <SpanLabel>
+            Total Espaço (Relogios) : <Span text={"4"} />
+          </SpanLabel>
+          <SpanLabel>
+            Valor Geral Raterio <Span text={"4"} />
+          </SpanLabel>
+          <SpanLabel>
+            Total Central de Ar Condicionado:
+            <Span text={"4"} />
+          </SpanLabel>
+        </div>
+      </div>
+       */}
+      <div className="w-full flex gap-12 my-3">
         <span className="text-green-500">
           Ativos ( {activeLeituras} / {activeCount} )
         </span>
         <span className="text-red-400 ">
           Vagos ( {vacanLeitura} / {vacantCount} )
         </span>
-
-        <span className="text-base flex items-center gap-4">
-          Custo Unitário Conta/Rateio:
-          <div className="relative">
-            <Input
-              ref={custoRateioRef}
-              placeholder="Informe o valor a cobrar"
-              title="Digite o custo da cobrança"
-              className="w-35  h-9 relative text-gray-900 dark:text-gray-50 "
-              type="number"
-            />{" "}
-            {dataCusto !== undefined && (
-              <span className="text-sm absolute right-10 top-2 text-gray-400">
-                R$
-              </span>
-            )}
-          </div>
-          {dataCusto === undefined ? (
-            <Button onClick={handleCustoRateio} className="w-30 h-9">
-              Registrar valor
-            </Button>
-          ) : (
-            <Button onClick={handleEditCusto} className="w-30 h-9">
-              Editar valor
-            </Button>
-          )}
-        </span>
-      </div>
-      <h3 className="font-semibold text-xl">Medição shopping</h3>
-      <div className="w-full flex gap-12 my-12">
-        <div className="flex flex-col gap-4 ">
-          <h3 className="font-semibold text-lg">Consumo {unit()}</h3>
-          <SpanLabel>
-            Total Espaço (Relogios) {unit()} : <Span text="totalRelogios" />
-          </SpanLabel>
-          <SpanLabel>
-            Valor Geral Raterio {unit()}:
-            <Span text="totalRelogios" />
-          </SpanLabel>
-          <SpanLabel>
-            Total Central de Ar Condicionado {unit()}:
-            <Span text="totalRelogios" />
-          </SpanLabel>
-        </div>
-        <div className="flex flex-col gap-4 ">
-          <h3 className="font-semibold text-lg">Valor total</h3>
-          <SpanLabel>
-            Total Espaço (Relogios) : <Span text="totalRelogios" />
-          </SpanLabel>
-          <SpanLabel>
-            Valor Geral Raterio <Span text="totalRelogios" />
-          </SpanLabel>
-          <SpanLabel>
-            Total Central de Ar Condicionado :<Span text="totalRelogios" />
-          </SpanLabel>
-        </div>
-        <div className="flex flex-col gap-4 ">
-          <h3 className="font-semibold text-lg">%Varl</h3>
-          <SpanLabel>
-            Total Espaço (Relogios) : <Span text="totalRelogios" />
-          </SpanLabel>
-          <SpanLabel>
-            Valor Geral Raterio <Span text="totalRelogios" />
-          </SpanLabel>
-          <SpanLabel>
-            Total Central de Ar Condicionado :<Span text="totalRelogios" />
-          </SpanLabel>
-        </div>
       </div>
       <div className=" w-full h-full ">
         <Tabela custoRateioRef={Number(custoRateioRef.current?.value)} />

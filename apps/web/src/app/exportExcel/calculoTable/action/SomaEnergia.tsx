@@ -13,8 +13,8 @@ export function calcularSomaEnergia(lojas: Loja[] | null | undefined) {
   // 🔹 lista de prefixos ou lojas que serão somadas separadamente
   if (!lojas || lojas.length === 0) {
     return {
-      totalPrincipal: 0,
-      totalSeparado: 0,
+      totalEspacoRelogio: 0,
+      totalArCondicionado: 0,
       totalGeral: 0,
     };
   }
@@ -25,34 +25,34 @@ export function calcularSomaEnergia(lojas: Loja[] | null | undefined) {
     "Central Agua Gelada ( Bomba )",
     "Casa Máquinas",
     "Cag Nova ( Piso Tecnico )",
-  ]; // exemplo -> aqui você decide quais
+  ]; 
 
   // Inicializa os totais
-  let totalPrincipal = 0;
-  let totalSeparado = 0;
+  let totalEspacoRelogio = 0;
+  let totalArCondicionado = 0;
 
   lojas?.forEach((loja) => {
     const consumoRef = loja.medidores[0]?.leituras[1]?.consumo_mensal || 0;
 
     if (grupoSeparado.includes(loja.nome_loja)) {
       // vai pro grupo separado
-      totalSeparado += consumoRef;
+      totalArCondicionado += consumoRef;
     } else {
+      
       // vai pro grupo principal
-      totalPrincipal += consumoRef;
+      totalEspacoRelogio += consumoRef;
     }
   });
-  const totalGeral = totalPrincipal + totalSeparado;
 
-  const totalGeralFormatado = (valor: number) => {
-    const valorFormatado = (valor / 100).toFixed(2);
+  const totalGeral = totalEspacoRelogio + totalArCondicionado;
 
-    return valorFormatado.replace(".", ",");
-  };
-  const valorGeral = totalGeralFormatado(totalGeral);
+  const totalAreaComum =
+    totalGeral - (totalEspacoRelogio + totalArCondicionado);
+
   return {
-    totalPrincipal,
-    totalSeparado,
-    valorGeral,
+    totalEspacoRelogio,
+    totalArCondicionado,
+    totalAreaComum,
+    totalGeral,
   };
 }

@@ -85,17 +85,35 @@ export function Card({ loja }: { loja: LojaProps }) {
   };
 
   const handleFinalSubmit = () => {
+    // 2. Mapeamento dos fatores de multiplicação por nome da loja
+    // Use um objeto para facilitar a consulta
+    const fatoresMultiplicacao: { [key: string]: number } = {
+      "Coco Bambu": 240,
+      "+54 Parrilla": 40,
+      "Americanas Express": 40,
+      "Teatro Colinas": 40,
+      "Da Gema": 60,
+      "Carregadores Veiculos C4": 20,
+    };
+
+    const fator = fatoresMultiplicacao[loja.nome_loja] || 1;
+
+    const result = formData.medicao_atual - medidor.ultima_leitura;
+
+    const consumoMensal = fator !== 1 ? result * fator : result;
+
     const new_leitura = {
       medidor_id: medidor.id,
-      mes: 8,
+      mes: month,
       ano: year,
       leitura_anterior: medidor.ultima_leitura,
       leitura_atual: formData.medicao_atual,
-      foto_url: null,
-      consumo_mensal: formData.medicao_atual - medidor.ultima_leitura,
+      foto_url: null, // Verifique se 'formData.foto' pode ser usado aqui
+      consumo_mensal: consumoMensal,
       nome_usuario: `${firstName} - ${user.funcao}`,
-      detalhes_leitura: `Leitura feito por ${firstName} - ${user.funcao} / data: ${currentDate}, Detalhes a acrecentar: ${formData.detalhes_leitura || null}`,
-      data_leitura: new Date("2025-06-01").toISOString(),
+
+      detalhes_leitura: `Leitura feito por ${firstName} - ${user.funcao} / data: ${currentDate},  Detalhes a acrecentar: ${formData.detalhes_leitura || null}`,
+      data_leitura: new Date("2025-06-01").toISOString(), // Atenção: data fixa? Provavelmente deveria ser 'new Date().toISOString()'
       nome_loja_leitura: loja.nome_loja,
     };
 

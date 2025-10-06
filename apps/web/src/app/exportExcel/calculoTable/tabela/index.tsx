@@ -9,12 +9,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useFetchLojaTabela, truncateText } from "@repo/utils";
-import { calcularDiferencaPercentualConsumo } from "../calcularDiferencaPercentualConsumo";
-import { formatFracao } from "../formatFracao";
-import { calculoValorPagar } from "../calcularValorPagar";
-import { calcularSomaEnergia } from "../calcularSomaEnergia";
-import { valorTotalPagarTaxa } from "../valorTotalPagarTaxa";
-import { getPercentualClass } from "../getPercentualClass";
+import { calcularDiferencaPercentualConsumo } from "../action/DiferencaPercentualConsumo";
+import { formatFracao } from "../action/formatFracao";
+import { calculoValorPagar } from "../action/ValorPagar";
+import { calcularSomaEnergia } from "../action/SomaEnergia";
+import { valorTotalPagarTaxa } from "../action/valorTotalPagarTaxa";
+import { getPercentualClass } from "../action/getPercentualClass";
 
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { useAppContext } from "@/src/context/useAppContext";
@@ -60,6 +60,7 @@ export function Tabela({ custoRateioRef }: TabelaProps) {
             >
               Consumo
             </TableHead>
+            {/* 
             <TableHead
               colSpan={4}
               className="text-center border-x-2 border-gray-100 px-20"
@@ -68,9 +69,9 @@ export function Tabela({ custoRateioRef }: TabelaProps) {
               {typeMedicao === "Agua" && "Agua"}
               {typeMedicao === "Gas" && "Gas"} loja a pagar
             </TableHead>
+            */}
           </TableRow>
 
-          {/* Segunda linha para detalhar Leitura Relógio */}
           <TableRow className="bg-[#3D3C6C] dark:bg-[#151526] hover:bg-[#3D3C6C] ">
             <TableHead className="border-x-2 px-12 border-gray-100 text-center">
               mês ref
@@ -89,6 +90,7 @@ export function Tabela({ custoRateioRef }: TabelaProps) {
             <TableHead className="text-center border-x-2 border-gray-100">
               %Var
             </TableHead>
+            {/* 
             <TableHead className="border-x-2 px-6 border-gray-100 text-center">
               Pagar mês ref
             </TableHead>
@@ -101,6 +103,7 @@ export function Tabela({ custoRateioRef }: TabelaProps) {
             <TableHead className="border-x-2 px-6 border-gray-100 text-center">
               C/Taxa
             </TableHead>
+            */}
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -211,14 +214,14 @@ Detalhes da leitura: ${item.medidores[0]?.leituras[1]?.detalhes_leitura}`}
                       )}{" "}
                       %
                     </TableCell>
-                    {/* ENERGIA PAGAR MÊS ANTERIOR (Custo calculado do MÊS PASSADO) */}
+                    {/* 
                     <TableCell className="font-semibold">
                       {calculoValorPagar(
                         item.medidores[0]?.leituras[1]?.consumo_mensal,
                         Number(custoRateioRef)
                       ) || 0}
                     </TableCell>
-                    {/* ENERGIA PAGAR MÊS REF (Custo calculado do MÊS DE REFERÊNCIA) */}
+               
                     <TableCell>
                       {" "}
                       {calculoValorPagar(
@@ -226,7 +229,6 @@ Detalhes da leitura: ${item.medidores[0]?.leituras[1]?.detalhes_leitura}`}
                         Number(custoRateioRef)
                       ) || 0}
                     </TableCell>
-                    {/* ENERGIA &Var (Variação Percentual do Custo - Assumindo que o %Var de consumo serve) */}
                     <TableCell
                       className={`${getPercentualClass(
                         calcularDiferencaPercentualConsumo(
@@ -242,7 +244,6 @@ Detalhes da leitura: ${item.medidores[0]?.leituras[1]?.detalhes_leitura}`}
                         )
                       )} px-8`}
                     >
-                      {/* Consumo Mês Ref (para o valor atual) */}
                       {calcularDiferencaPercentualConsumo(
                         calculoValorPagar(
                           item.medidores[0]?.leituras[1]?.consumo_mensal,
@@ -255,7 +256,7 @@ Detalhes da leitura: ${item.medidores[0]?.leituras[1]?.detalhes_leitura}`}
                         )
                       ) || 0}
                     </TableCell>
-                    {/* Mantenho o placeholder para o cálculo de custo */}
+                    
                     <TableCell className="font-semibold text-blue-700 dark:text-blue-400">
                       {valorTotalPagarTaxa(
                         calculoValorPagar(
@@ -264,6 +265,7 @@ Detalhes da leitura: ${item.medidores[0]?.leituras[1]?.detalhes_leitura}`}
                         )
                       )}
                     </TableCell>
+                      */}
                   </TableRow>
                 );
               })}
