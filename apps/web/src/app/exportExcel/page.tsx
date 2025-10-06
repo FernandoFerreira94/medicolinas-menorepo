@@ -168,7 +168,7 @@ export default function ExportExcel() {
   };
  */
   return (
-    <Content title="Tabela de consumo">
+    <Content title="Tabela de consumo ">
       <section className="items-end  mt-8 flex w-full">
         <div className="flex gap-16 items-end ">
           <InputDate />

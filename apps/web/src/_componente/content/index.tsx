@@ -3,7 +3,7 @@
 "use client";
 import { MdOutlineToggleOff, MdToggleOn } from "react-icons/md";
 import { useAppContext } from "../../context/useAppContext";
-import { SideBar } from "../../_componente/sideBar";
+import { SideBar } from "../sideBar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ModeToggle } from "@/components/ui/modeToggle";
 import { roxoPrimary, useFetchUser } from "@repo/utils";
