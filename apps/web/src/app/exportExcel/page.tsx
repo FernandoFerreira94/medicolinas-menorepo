@@ -10,12 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAppContext } from "@/src/context/useAppContext";
-import {
-  useFetchLojaTabela,
-  useCreateCusto,
-  useFechCusto,
-  useUpdateCusto,
-} from "@repo/utils";
+import { useFetchLojaTabela, useFechCusto, useUpdateCusto } from "@repo/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
@@ -34,7 +29,7 @@ export default function ExportExcel() {
     ano_custo: year,
     tipo_custo: typeMedicao,
   });
-  const { mutate } = useCreateCusto();
+
   const { mutate: mutateCusto } = useUpdateCusto();
   const somaTotalEnergia = calcularSomaEnergia(data);
   console.log(somaTotalEnergia);

@@ -12,20 +12,14 @@ export async function signInService({ matricula, password }: LoginProps) {
       });
 
     if (authError) {
-      return {
-        error: `Erro ao fazer login:, ${authError.message}`,
-        user: null,
-      };
+      throw new Error(`Erro ao fazer login: ${authError.message}`);
     }
 
     const userId = authData.user?.id;
     const session = authData.session;
 
     if (!userId) {
-      return {
-        error: "ID do usuário não encontrado após o login.",
-        user: null,
-      };
+      throw new Error("ID do usuário não encontrado após o login.");
     }
 
     const { data: userData, error: userError } = await supabase
@@ -35,12 +29,11 @@ export async function signInService({ matricula, password }: LoginProps) {
       .single();
 
     if (userError) {
-      console.error("Erro ao buscar dados do usuário:", userError.message);
-      return { error: userError.message, user: null };
+      throw new Error(userError.message);
     }
 
-    return { error: null, user: userData as UsuarioProps, session };
+    return { user: userData as UsuarioProps, session };
   } catch (error) {
-    return { error: (error as Error).message, user: null };
+    throw error; // aqui lança o erro de verdade para o React Query
   }
 }

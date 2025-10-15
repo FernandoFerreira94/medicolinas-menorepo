@@ -135,6 +135,7 @@ export function Card({ loja }: { loja: LojaProps }) {
     }
     return false;
   };
+  
   const isMedidorVerified = verifiedMedidor();
 
   // CORREÇÃO: Nova lógica para verificar se a leitura já foi feita no mês

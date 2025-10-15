@@ -30,7 +30,6 @@ export * from "./src/hook/useFetchLojasString";
 export * from "./src/hook/useUpdateLojaMedidores";
 export * from "./src/actives/FormatValor";
 export * from "./src/actives/FormatMedicao";
-export * from "./src/hook/useCreateCusto";
 export * from "./src/hook/useFechCusto";
 export * from "./src/hook/useUpdateCusto";
 export * from "./src/actives/truncateText";

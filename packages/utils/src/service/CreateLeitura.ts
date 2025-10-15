@@ -14,7 +14,6 @@ export async function CreateLeitura(new_leitura: LeituraProps) {
 
   const medidorId = insertedData.medidor_id;
   const novaLeitura = insertedData.leitura_atual;
-  console.log(novaLeitura);
   const { data: updatedMedidor, error: updateError } = await supabase
     .from("medidores")
     .update({ ultima_leitura: novaLeitura })
