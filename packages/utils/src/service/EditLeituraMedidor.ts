@@ -1,63 +1,81 @@
 import { supabase } from "../supabase";
 import type { EditLeitura, EditMedidor, EditLoja } from "../types";
+import { uploadImageToSupabase } from "./StorageService";
 
 export async function EditLeituraMedidor(
-  medidor_id: string, // ✅ Parâmetro obrigatório
-  loja_id: string, // ✅ Parâmetro obrigatório
-  dataMedidor: EditMedidor, // ✅ Parâmetro obrigatório
-  dataLoja: EditLoja, // ✅ Parâmetro obrigatório
-  leitura_id?: string, // ✅ Parâmetro opcional
-  dataLeitura?: EditLeitura // ✅ Parâmetro opcional
+  medidor_id: string,
+  loja_id: string,
+  dataMedidor: EditMedidor,
+  dataLoja: EditLoja,
+  leitura_id?: string,
+  dataLeitura?: EditLeitura
 ) {
+  let fotoUrl: string | null = null;
+
+  if (
+    dataLeitura?.foto_url &&
+    (dataLeitura.foto_url instanceof File ||
+      typeof dataLeitura.foto_url === "object")
+  ) {
+    try {
+      fotoUrl = await uploadImageToSupabase(
+        dataLeitura.foto_url,
+        dataLeitura.nome_loja_leitura,
+        dataLeitura.medidor_id
+      );
+    } catch (error) {
+      console.error("Erro ao fazer upload da foto:", error);
+      throw new Error(
+        "Não foi possível enviar a imagem para o Supabase Storage."
+      );
+    }
+  }
+  const leituraToInsert = {
+    ...dataLeitura,
+    foto_url: fotoUrl || null, // agora é uma URL string ou null
+  };
+
   try {
-    // ✅ 1. Declare as variáveis com 'let' para que o escopo seja a função inteira
     let data_loja = null;
     let data_leitura = null;
     let data_medidor = null;
 
-    // ✅ 2. Execute a atualização da Loja
-    const { data, error: error_loja } = await supabase
+    const { data: lojaData, error: error_loja } = await supabase
       .from("lojas")
       .update(dataLoja)
       .eq("id", loja_id)
       .select("*");
 
-    if (error_loja) {
+    if (error_loja)
       throw new Error("Erro ao editar Loja: " + error_loja.message);
-    }
-    data_loja = data; // Atribua o valor à variável de escopo mais amplo
+    data_loja = lojaData;
 
-    // ✅ 3. Adicione a atualização da Leitura dentro da condição
     if (leitura_id && dataLeitura) {
-      const { data, error: error_leitura } = await supabase
+      const { data: leituraData, error: error_leitura } = await supabase
         .from("leituras")
-        .update(dataLeitura)
+        .update(leituraToInsert)
         .eq("id", leitura_id)
         .select("*");
 
-      if (error_leitura) {
+      if (error_leitura)
         throw new Error("Erro ao editar Leitura: " + error_leitura.message);
-      }
-      data_leitura = data; // Atribua o valor aqui
+      data_leitura = leituraData;
     }
 
-    // ✅ 4. Execute a atualização do Medidor
     const { data: medidorData, error: error_medidor } = await supabase
       .from("medidores")
       .update(dataMedidor)
       .eq("id", medidor_id)
       .select("*");
 
-    if (error_medidor) {
+    if (error_medidor)
       throw new Error("Erro ao editar Medidor: " + error_medidor.message);
-    }
-    data_medidor = medidorData; // Atribua o valor aqui
+    data_medidor = medidorData;
 
-    // ✅ 5. Retorne os dados com segurança
     return {
       leitura: data_leitura?.[0] || null,
-      medidor: data_medidor?.[0] || null, // Adicionado null safe operator
-      loja: data_loja?.[0] || null, // Adicionado null safe operator
+      medidor: data_medidor?.[0] || null,
+      loja: data_loja?.[0] || null,
     };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

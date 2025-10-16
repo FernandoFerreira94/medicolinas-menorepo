@@ -20,6 +20,7 @@ interface UpdateLojaAndMedidoresInput {
     tem_energia_switch: boolean;
     tem_agua_switch: boolean;
     tem_gas_switch: boolean;
+    foto_url?: File | string | null;
   };
 }
 

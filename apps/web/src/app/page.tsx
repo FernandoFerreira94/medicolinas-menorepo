@@ -39,7 +39,7 @@ export default function Login() {
       router.push("/medicao");
     },
     onError: (error) => {
-      toast.error(`Erro no login: ${error.message}`);
+      toast.error(error.message);
       setToken("");
       Cookie.set("auth_token", "", { expires: 7 });
     },

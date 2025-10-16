@@ -18,6 +18,7 @@ interface UpdateLeituraMedidorVariables {
   dataLoja: EditLoja;
   dataLeitura?: EditLeitura;
   ultima_leitura?: number;
+  foto_url?: File | string | null;
 }
 
 export function useEditLeituraMedidor(
@@ -36,7 +37,6 @@ export function useEditLeituraMedidor(
       dataMedidor,
       dataLoja,
     }) => {
-      // ✅ Correção: Passando os parâmetros corretamente para a função
       const result = await EditLeituraMedidor(
         medidor_id,
         loja_id,

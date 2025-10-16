@@ -20,12 +20,12 @@ export function AppProvider({ children }: AppProviderProps) {
   const [token, setToken] = useState<string>("");
   const [user, setUser] = useState<UsuarioProps | null>(null);
   const [dateFull, setDateFull] = useState<string>(currentDate);
-  const [month, setMonth] = useState<number>(9);
+  const [month, setMonth] = useState<number>(currentMonth);
   const [year, setYear] = useState<number>(currentYear);
   const [typeMedicao, setTypeMedicao] = useState<"Energia" | "Agua" | "Gas">(
     "Energia"
   );
-  const [localidade, setLocalidade] = useState<string>("");
+  const [localidade, setLocalidade] = useState<string>("all");
   const [firstName, setFirstName] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const { data } = useFetchUser();

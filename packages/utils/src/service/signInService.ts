@@ -12,7 +12,7 @@ export async function signInService({ matricula, password }: LoginProps) {
       });
 
     if (authError) {
-      throw new Error(`Erro ao fazer login: ${authError.message}`);
+      throw new Error(`Ops. matriculo ou senha incorretos.`);
     }
 
     const userId = authData.user?.id;

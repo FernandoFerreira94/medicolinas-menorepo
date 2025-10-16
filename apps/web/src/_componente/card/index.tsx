@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import Link from "next/link";
 
 import { toast } from "sonner";
@@ -24,6 +24,7 @@ import {
   truncateText,
 } from "@repo/utils";
 import { Textarea } from "@/components/ui/textarea";
+import Image from "next/image";
 
 const date = new Date();
 const currentDay = date.getDate();
@@ -47,7 +48,11 @@ export function Card({ loja }: { loja: LojaProps }) {
 
   const [isFormSheetOpen, setIsFormSheetOpen] = useState(false);
   const [isConfirmSheetOpen, setIsConfirmSheetOpen] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    medicao_atual: number;
+    detalhes_leitura: string;
+    foto: File | null;
+  }>({
     medicao_atual: 0,
     detalhes_leitura: "",
     foto: null,
@@ -72,6 +77,16 @@ export function Card({ loja }: { loja: LojaProps }) {
       toast.info("Por favor, preencha a medição atual com um valor válido.");
       return;
     }
+    if (!formData.foto) {
+      toast.info("Por favor, insira uma foto do meidor.");
+      return;
+    }
+
+    if (medidor.numero_relogio === "BUSWAY") {
+      setIsFormSheetOpen(false);
+      setIsConfirmSheetOpen(true);
+      return;
+    }
 
     if (!user.is_adm) {
       if (formData.medicao_atual < medidor.ultima_leitura) {
@@ -84,9 +99,39 @@ export function Card({ loja }: { loja: LojaProps }) {
     setIsConfirmSheetOpen(true);
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+
+    if (file) {
+      // 1. Verificação do tipo de arquivo (Frontend)
+      const acceptedImageTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp",
+      ];
+      if (!acceptedImageTypes.includes(file.type)) {
+        toast.error(
+          "Por favor, selecione um arquivo de imagem (JPG, PNG, WEBP)."
+        );
+        setFormData({ ...formData, foto: null }); // Limpa o campo de foto
+        return;
+      }
+      // Opcional: verificação de tamanho máximo do arquivo no frontend
+      const MAX_FILE_SIZE_MB = 20; // 5 MB
+      if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+        toast.error(`A imagem deve ter no máximo ${MAX_FILE_SIZE_MB}MB.`);
+        setFormData({ ...formData, foto: null });
+        return;
+      }
+
+      setFormData({ ...formData, foto: file });
+    } else {
+      setFormData({ ...formData, foto: null });
+    }
+  };
+
   const handleFinalSubmit = () => {
-    // 2. Mapeamento dos fatores de multiplicação por nome da loja
-    // Use um objeto para facilitar a consulta
     const fatoresMultiplicacao: { [key: string]: number } = {
       "Coco Bambu": 240,
       "+54 Parrilla": 40,
@@ -100,16 +145,26 @@ export function Card({ loja }: { loja: LojaProps }) {
 
     const result = formData.medicao_atual - medidor.ultima_leitura;
 
-    const consumoMensal = fator !== 1 ? result * fator : result;
+    const consumoMensal = () => {
+      if (medidor.numero_relogio === "BUSWAY") {
+        const consumoBusway = formData.medicao_atual;
+        return consumoBusway;
+      } else {
+        const consumoRelogioNormal = fator !== 1 ? result * fator : result;
+        return consumoRelogioNormal;
+      }
+    };
+
+    const consumo = consumoMensal();
 
     const new_leitura = {
-      medidor_id: medidor.id,
+      medidor_id: medidor.id!,
       mes: month,
       ano: year,
       leitura_anterior: medidor.ultima_leitura,
       leitura_atual: formData.medicao_atual,
-      foto_url: null, // Verifique se 'formData.foto' pode ser usado aqui
-      consumo_mensal: consumoMensal,
+      foto_url: formData.foto,
+      consumo_mensal: consumo,
       nome_usuario: `${firstName} - ${user.funcao}`,
 
       detalhes_leitura: `Leitura feito por ${firstName} - ${user.funcao} / data: ${currentDate},  Detalhes a acrecentar: ${formData.detalhes_leitura || null}`,
@@ -117,6 +172,7 @@ export function Card({ loja }: { loja: LojaProps }) {
       nome_loja_leitura: loja.nome_loja,
     };
 
+    console.log(new_leitura);
     mutate(new_leitura);
 
     setIsConfirmSheetOpen(false);
@@ -135,7 +191,7 @@ export function Card({ loja }: { loja: LojaProps }) {
     }
     return false;
   };
-  
+
   const isMedidorVerified = verifiedMedidor();
 
   // CORREÇÃO: Nova lógica para verificar se a leitura já foi feita no mês
@@ -143,9 +199,14 @@ export function Card({ loja }: { loja: LojaProps }) {
     (leitura) => leitura.mes === month && leitura.ano === year
   );
 
-  const shouldDisableButton = medidorJaLidoNoMes || 26 < 25;
-
-  // Função para limitar o texto
+  const shouldDisableButton2 = () => {
+    if (user.is_adm) {
+      return false;
+    }
+    const isShouldDisable = medidorJaLidoNoMes || 28 < 27;
+    return isShouldDisable;
+  };
+  const shouldDisable = shouldDisableButton2();
 
   const nomePrefixo = `${loja.prefixo_loja} - ${loja.numero_loja}`;
 
@@ -217,7 +278,7 @@ export function Card({ loja }: { loja: LojaProps }) {
 
         <Sheet open={isFormSheetOpen} onOpenChange={setIsFormSheetOpen}>
           <SheetTrigger asChild>
-            <Button disabled={shouldDisableButton} className="w-full h-8 ">
+            <Button disabled={shouldDisable} className="w-full h-8 ">
               Medição
             </Button>
           </SheetTrigger>
@@ -236,7 +297,7 @@ export function Card({ loja }: { loja: LojaProps }) {
               </SheetTitle>
 
               <SheetDescription asChild className="text-gray-50 h-full ">
-                <div className="text-gray-50 flex-col flex gap-4 mt-8  ">
+                <div className="text-gray-50 flex-col flex gap-4 mt-2  ">
                   <div className="flex flex-col gap-2">
                     <span className="font-semibold text-lg">Complexo</span>
                     <Label>{loja.complexo}</Label>
@@ -290,24 +351,29 @@ export function Card({ loja }: { loja: LojaProps }) {
                     <span className="font-semibold text-lg">Foto Relógio</span>
                     <Input
                       type="file"
-                      //  onChange={(e) =>
-                      //setFormData({
-                      //        ...formData,
-                      //      foto: e.target.files?.[0] || null,
-                      //})
-                      //  }
+                      accept="image/jpeg, image/png, image/webp" // Adicionado accept
+                      onChange={handleFileChange} // Usar a nova função de handler
                     />
                   </div>
-
-                  {formData.medicao_atual >= medidor.ultima_leitura && (
-                    <Button
-                      onClick={handleNextStep}
-                      className="w-full  mt-auto"
-                      variant={"outline"}
-                    >
-                      Registrar medição
-                    </Button>
+                  {formData.foto && (
+                    <div className="w-full, h-full, bg-white rounded-md flex justify-center items-center">
+                      <Image
+                        src={URL.createObjectURL(formData.foto)}
+                        alt="Foto do relogio"
+                        width={100}
+                        height={100}
+                        className="w-full h-20 object-contain rounded-md"
+                      />
+                    </div>
                   )}
+
+                  <Button
+                    onClick={handleNextStep}
+                    className="w-full "
+                    variant={"outline"}
+                  >
+                    Registrar medição
+                  </Button>
                 </div>
               </SheetDescription>
             </SheetHeader>

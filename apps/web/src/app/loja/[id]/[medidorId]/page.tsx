@@ -1,16 +1,8 @@
 "use client";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-  Tooltip,
-  LabelList,
-} from "recharts";
+
 import { useRouter } from "next/navigation";
 import { Loader2Icon } from "lucide-react";
-import { ChartContainer } from "@/components/ui/chart";
+
 import React, { useState, useEffect } from "react";
 import { Content } from "@/src/_componente/content";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -30,17 +22,19 @@ import {
   useFetchUser,
   useEditLeituraMedidor,
   LeituraProps,
-  formatarFracao,
   formatarMedicao,
 } from "@repo/utils";
 import { Input } from "@/components/ui/input";
 import { Localidade } from "@/src/_componente/dateTipoMedicao/localidade";
-import { CustomTooltip, chartConfig } from "./CustomTooltip";
+
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 
 import { useAppContext } from "@/src/context/useAppContext";
 import { toast } from "sonner";
+import Image from "next/image";
+import { PrefixoLoja } from "../../component/prefixoLoja";
+import { Chart } from "../../component/Chart";
 
 export default function InfoLoja({ params }: DetalhesProps) {
   const resolvedParams = React.use(params);
@@ -58,6 +52,8 @@ export default function InfoLoja({ params }: DetalhesProps) {
   const [numero_loja, setNumero_loja] = useState("");
   const [detalheMedidor, setDetalheMedidor] = useState("");
   const [medicao_atual, setMedicao_atual] = useState("");
+  const [newPhoto, setNewPhoto] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const { data, isLoading, error } = useFetchLojaSingle(id, medidorId);
   const [prefixo, setPrefixo] = useState(data?.loja?.prefixo_loja || "");
@@ -74,8 +70,11 @@ export default function InfoLoja({ params }: DetalhesProps) {
     },
   });
   const { data: userData } = useFetchUser();
-
   const is_admin = userData?.user?.is_adm;
+
+  const leituraFiltradaMonth = data?.medidor?.leituras?.filter(
+    (leitura: LeituraProps) => leitura.mes === month && leitura.ano === year
+  );
 
   useEffect(() => {
     if (data) {
@@ -83,16 +82,18 @@ export default function InfoLoja({ params }: DetalhesProps) {
       setLeitura_atual(
         data.medidor.leituras[0]?.leitura_atual || data.medidor.ultima_leitura
       );
+
       setDetalheLeitura(
-        data.medidor.leituras[0]?.detalhes_leitura || "Sem detalhe"
+        leituraFiltradaMonth[0].detalhes_leitura || "Sem detalhe"
       );
       setAtiva(data.loja.ativa);
       setQuadroDistribuicao(data?.medidor?.quadro_distribuicao || "");
       setDetalheMedidor(data?.medidor?.detalhes || "Sem detalhes");
+
+      setNome_loja(data?.loja?.nome_loja || "");
+      setNumero_loja(data?.loja?.numero_loja || "");
+      setPrefixo(data?.loja?.prefixo_loja || "");
     }
-    setNome_loja(data?.loja?.nome_loja || "");
-    setNumero_loja(data?.loja?.numero_loja || "");
-    setPrefixo(data?.loja?.prefixo_loja || "");
   }, [data]);
 
   useEffect(() => {
@@ -107,41 +108,6 @@ export default function InfoLoja({ params }: DetalhesProps) {
     }
   }, [data?.medidor.localidade, data?.loja.prefixo_loja]);
 
-  if (!data) {
-    return (
-      <Content title={` `}>
-        <Skeleton className="h-10 w-60" />
-      </Content>
-    );
-  }
-
-  let chartData: ChartDataItem[] = [];
-  if (data && data.medidor.leituras) {
-    const sortedLeituras = [...data.medidor.leituras].sort((a, b) => {
-      const dateA = new Date(a.ano, a.mes - 1, 1);
-      const dateB = new Date(b.ano, b.mes - 1, 1);
-      return dateA.getTime() - dateB.getTime();
-    });
-
-    const lastSixLeituras = sortedLeituras.slice(-6);
-    chartData = lastSixLeituras.map((leitura) => ({
-      nome_loja: leitura.nome_loja_leitura,
-      month: `${leitura.mes}/${leitura.ano}`,
-      consumo: leitura.consumo_mensal,
-      detalhes: leitura.detalhes_leitura || "Nenhum detalhe disponível",
-    }));
-  }
-
-  if (isLoading || error || !data) {
-    return (
-      <Content title={` `}>
-        <Skeleton className="h-10 w-60" />
-      </Content>
-    );
-  }
-
-  const leitura_id = data?.medidor?.leituras[0]?.id;
-  const loja_id = data?.loja?.id;
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -160,37 +126,82 @@ export default function InfoLoja({ params }: DetalhesProps) {
       prefixo_loja: prefixo,
       ativa,
     };
-
     // ✅ CORREÇÃO: Use a lógica de if/else para chamar a mutação
-    if (data?.medidor.leituras.length > 0) {
-      const dataLeitura = {
-        leitura_atual: Number(leitura_atual),
-        detalhes_leitura: detalheLeitura,
-      };
 
-      mutate({
-        medidor_id: data?.medidor?.id,
-        ultima_leitura: leitura_atual,
-        loja_id,
-        dataMedidor,
-        dataLoja,
-        leitura_id,
-        dataLeitura,
-      });
-    } else {
-      // Se não houver leitura, chame a mutação sem os dados de leitura
-      mutate({
-        medidor_id: data?.medidor?.id,
-        loja_id,
-        dataMedidor,
-        dataLoja,
-      });
-    }
+    const dataLeitura = {
+      leitura_atual: Number(leitura_atual),
+      detalhes_leitura: detalheLeitura,
+      foto_url: newPhoto,
+      nome_loja_leitura: data?.loja?.nome_loja,
+      medidor_id: data?.medidor?.id,
+    };
+
+    console.log("data Loja" + dataLoja.nome_loja);
+    console.log(dataLeitura);
+
+    mutate({
+      medidor_id: data?.medidor?.id,
+      ultima_leitura: leitura_atual,
+      loja_id,
+      dataMedidor,
+      dataLoja,
+      leitura_id,
+      dataLeitura,
+    });
   }
 
-  const leituraMonth = data?.medidor?.leituras?.filter(
-    (leitura: LeituraProps) => leitura.mes === month && leitura.ano === year
-  );
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+
+    if (file) {
+      const acceptedImageTypes = [
+        "image/jpeg",
+        "image/jpg",
+        "image/png",
+        "image/webp",
+      ];
+      if (!acceptedImageTypes.includes(file.type)) {
+        toast.error(
+          "Por favor, selecione um arquivo de imagem (JPG, PNG, WEBP)."
+        );
+        setNewPhoto(null);
+        setPreviewUrl(null);
+        return;
+      }
+
+      const MAX_FILE_SIZE_MB = 20;
+      if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+        toast.error(`A imagem deve ter no máximo ${MAX_FILE_SIZE_MB}MB.`);
+        setNewPhoto(null);
+        setPreviewUrl(null);
+        return;
+      }
+
+      setNewPhoto(file);
+      setPreviewUrl(URL.createObjectURL(file)); // ← cria URL temporária
+    } else {
+      setNewPhoto(null);
+      setPreviewUrl(null);
+    }
+  };
+
+  if (isLoading || error || !data) {
+    return (
+      <Content title={` `}>
+        <Skeleton className="h-10 w-60" />
+      </Content>
+    );
+  }
+  if (!data) {
+    return (
+      <Content title={` `}>
+        <Skeleton className="h-10 w-60" />
+      </Content>
+    );
+  }
+
+  const leitura_id = leituraFiltradaMonth[0]?.id;
+  const loja_id = data?.loja?.id;
 
   return (
     <Content
@@ -249,41 +260,12 @@ export default function InfoLoja({ params }: DetalhesProps) {
                 className={`border-3 ${edit ? "border-transparent " : "border-gray-700 dark:border-gray-300 "}`}
               />
             </div>
-            <div className="flex flex-col gap-2">
-              <Label>Prefixo loja</Label>
-              <Select
-                required
-                value={prefixo}
-                onValueChange={setPrefixo}
-                disabled={edit}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="NS">NS - (Nivel Superior)</SelectItem>
-                  <SelectItem value="NT">NT - (Nivel Terreo)</SelectItem>
-                  <SelectItem value="QS">QS - (Quisque Superior)</SelectItem>
-                  <SelectItem value="QT">QT - (Quisque Terreo)</SelectItem>
-                  <SelectItem value="QBT">
-                    QBT - (Quisque Boulevard Terreo)
-                  </SelectItem>
-                  <SelectItem value="QVB">
-                    QVB - (Quisque Vitrine Boulevard )
-                  </SelectItem>
-                  <SelectItem value="AE">AE - (Area externa)</SelectItem>
-                  <SelectItem value="AT">AT - (Area Tecnica)</SelectItem>
-                  <SelectItem value="CE">CE </SelectItem>
-                  <SelectItem value="D">D - (Deposito)</SelectItem>
-                  <SelectItem value="EST">EST - (Estacionamento)</SelectItem>
-                  <SelectItem value="TR">TR - (Torre Comercial)</SelectItem>
-                  <SelectItem value="CAG">
-                    CAG ( Central Agua Gelada )
-                  </SelectItem>
-                  <SelectItem value=" ">outros</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <PrefixoLoja
+              edit={edit}
+              prefixo={prefixo}
+              setPrefixo={setPrefixo}
+            />
+
             <div className="flex flex-col gap-2">
               <Label>Numero loja</Label>
               <Input
@@ -331,37 +313,65 @@ export default function InfoLoja({ params }: DetalhesProps) {
               </div>
             )}
             <div className="flex flex-col gap-2">
-              <Label>Leitura mês anterior</Label>
+              <Label>
+                {data.medidor.numero_relogio !== "BUSWAY"
+                  ? "Leitura mês anterior"
+                  : "Consumo mês anterior"}
+              </Label>
               <span className="dark:bg-[#151526] border py-2 px-4 rounded-md bg-white">
-                {formatarMedicao(leituraMonth[0]?.leitura_anterior) ||
+                {formatarMedicao(leituraFiltradaMonth[0]?.leitura_anterior) ||
                   formatarMedicao(data?.medidor?.ultima_leitura)}
               </span>{" "}
             </div>
             <div className="flex flex-col gap-2">
-              <Label>Leitura mês atual</Label>
+              <Label>
+                {data.medidor.numero_relogio !== "BUSWAY"
+                  ? "Leitura mês atual"
+                  : "Consumo mês atual"}
+              </Label>
               <Input
                 disabled={edit}
                 value={medicao_atual}
                 className={`border-3 ${edit ? "border-transparent " : "border-gray-700 dark:border-gray-300 "}`}
                 placeholder={
-                  formatarMedicao(leituraMonth[0]?.leitura_atual) ||
+                  formatarMedicao(leituraFiltradaMonth[0]?.leitura_atual) ||
                   "Sem leitura"
                 }
                 onChange={(e) => setMedicao_atual(e.target.value)}
                 type="number"
               />
             </div>
-            <div className="flex flex-col gap-2">
-              <Label>Consumo</Label>
-              <span className="dark:bg-[#151526] border py-2 px-4 rounded-md bg-white">
-                {leituraMonth[0]?.consumo_mensal || "Sem leitura"}
-              </span>{" "}
-            </div>
+            {data.medidor.numero_relogio !== "BUSWAY" && (
+              <div className="flex flex-col gap-2">
+                <Label>Consumo</Label>
+                <span className="dark:bg-[#151526] border py-2 px-4 rounded-md bg-white">
+                  {leituraFiltradaMonth[0]?.consumo_mensal || "Sem leitura"}
+                </span>{" "}
+              </div>
+            )}
             <div className="flex flex-col gap-2">
               <Label>Foto do relogio</Label>
-              <span className="dark:bg-[#151526] border py-2 px-4 rounded-md bg-white">
-                {leituraMonth[0]?.foto_url || "Sem foto"}
-              </span>{" "}
+              {leituraFiltradaMonth[0]?.foto_url || previewUrl ? (
+                <div>
+                  <Image
+                    src={previewUrl || leituraFiltradaMonth[0]?.foto_url}
+                    alt="Foto do relogio"
+                    width={200}
+                    height={200}
+                  />
+                </div>
+              ) : (
+                <span className="dark:bg-[#151526] text-gray-500 border py-2 px-4 rounded-md bg-white">
+                  Sem foto
+                </span>
+              )}
+              {!edit && (
+                <Input
+                  type="file"
+                  accept="image/jpeg,image/jpg, image/png, image/webp"
+                  onChange={handleFileChange}
+                />
+              )}
             </div>
 
             <div className="flex flex-col gap-2">
@@ -373,7 +383,6 @@ export default function InfoLoja({ params }: DetalhesProps) {
                 className={`border-3 ${edit ? "border-transparent " : "border-gray-700 dark:border-gray-300 "}`}
               />
             </div>
-
             <div className="flex flex-col gap-2">
               <Label>Detalhe da leitura</Label>
               <Textarea
@@ -401,36 +410,8 @@ export default function InfoLoja({ params }: DetalhesProps) {
             )}
           </form>
         </section>
-        <section className="w-full  border mt-18 py-8  bg-white dark:bg-[#151526] rounded-xl">
-          <ChartContainer
-            config={chartConfig}
-            className="min-h-[500px] w-full "
-          >
-            <BarChart accessibilityLayer data={chartData}>
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="month"
-                tickLine
-                tickMargin={10}
-                axisLine
-                tickFormatter={(value, index) => {
-                  const loja = chartData[index]?.nome_loja;
-                  return `${value} - ${loja}`;
-                }}
-              />
-              <YAxis dataKey="consumo" />
-              <Tooltip content={<CustomTooltip />} />
-              <Bar
-                dataKey="consumo"
-                fill="var(--color-consumo)"
-                radius={4}
-                barSize={100}
-              >
-                <LabelList dataKey="consumo" position="top" />
-              </Bar>
-            </BarChart>
-          </ChartContainer>
-        </section>
+
+        <Chart data={data} />
       </main>
     </Content>
   );

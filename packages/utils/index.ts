@@ -33,3 +33,4 @@ export * from "./src/actives/FormatMedicao";
 export * from "./src/hook/useFechCusto";
 export * from "./src/hook/useUpdateCusto";
 export * from "./src/actives/truncateText";
+export * from "./src/service/StorageService";

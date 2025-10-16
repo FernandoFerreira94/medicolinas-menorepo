@@ -28,7 +28,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
             toastOptions={{
               unstyled: true,
               className:
-                "flex items-center justify-center  p-2 px-4 w-full rounded-full shadow-lg border-2 border-green-600 text-gray-100 bg-gray-900 dark:bg-[#151526] dark:border-green-600 dark:text-gray-100",
+                "flex items-center justify-center gap-2 p-2 px-4 w-full rounded-md shadow-lg border-2 border-green-600 text-gray-100 bg-gray-900 dark:bg-[#151526] dark:border-green-600 dark:text-gray-100",
             }}
           />
         </ThemeProvider>

@@ -52,7 +52,14 @@ export interface LojaProps {
   tem_energia: boolean;
   tem_agua: boolean;
   tem_gas: boolean;
-  medidores: MedidorComLeitura[];
+  medidor: MedidorComLeitura[];
+}
+
+export interface LojaComLeiturasCombinadas {
+  id?: string;
+  nome_loja: string;
+  medidor: MedidorComLeitura[];
+  leituras: LeituraProps[];
 }
 
 export interface MedidorProps extends Medidores {
@@ -72,12 +79,13 @@ export interface LeituraProps {
   leitura_anterior?: number;
   created_at?: string;
   consumo_anterior?: number;
-  foto_url?: string | null;
+  foto_url: File | string | null;
   detalhes_leitura?: string | null;
-  nome_loja_leitura?: string;
-  medidor_id?: string;
+  nome_loja_leitura: string;
+  medidor_id: string;
   nome_usuario: string;
   medidor?: string;
+  data_leitura?: string;
 }
 
 export interface Medidores {
@@ -99,7 +107,7 @@ export interface MedidorComLeitura {
   ultima_leitura: number;
   detalhes: string;
   data_instalacao: string;
-  leituras: LeituraProps[]; // Adicione a leitura aqui, como um array
+  leituras: LeituraProps;
 }
 
 export interface DetalhesProps {
@@ -128,6 +136,9 @@ export interface TooltipPayload {
 export interface EditLeitura {
   leitura_atual?: number | null;
   detalhes_leitura?: string | null;
+  foto_url?: File | string | null;
+  nome_loja_leitura: string;
+  medidor_id: string;
 }
 
 export interface EditMedidor {
